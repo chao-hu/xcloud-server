@@ -14,6 +14,13 @@ import com.xxx.xcloud.common.ReturnCode;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 
+/**
+ * @ClassName: TestController
+ * @Description: TestController
+ * @author huchao
+ * @date 2019年10月24日
+ *
+ */
 @Controller
 @RequestMapping("/v1/")
 public class TestController {

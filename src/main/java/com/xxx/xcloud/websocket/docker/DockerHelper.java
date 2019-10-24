@@ -11,7 +11,7 @@ import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.DockerClientConfig;
-import com.xxx.xcloud.common.BdosProperties;
+import com.xxx.xcloud.common.XcloudProperties;
 import com.xxx.xcloud.common.Global;
 
 /**
@@ -32,8 +32,8 @@ public class DockerHelper {
     private static DockerClient openDockerClient(String dockerHostIp) {
         Assert.notNull(dockerHostIp, "dockerHostIp cat not empty!");
 
-        String dockerHostPort = BdosProperties.getConfigMap().get(Global.DOCKER_DAEMON_PORT);
-        String dockerHostVersion = BdosProperties.getConfigMap().get(Global.DOCKER_DAEMON_APIVERSION);
+        String dockerHostPort = XcloudProperties.getConfigMap().get(Global.DOCKER_DAEMON_PORT);
+        String dockerHostVersion = XcloudProperties.getConfigMap().get(Global.DOCKER_DAEMON_APIVERSION);
         String dockerHost = "tcp://" + dockerHostIp + ":" + dockerHostPort;
 
         DefaultDockerClientConfig.Builder clientBuilder = DefaultDockerClientConfig.createDefaultConfigBuilder();

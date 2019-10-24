@@ -7,6 +7,13 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ * @ClassName: SysClusterInfo
+ * @Description: 系统配置实体
+ * @author huchao
+ * @date 2019年10月24日
+ *
+ */
 @Entity
 @Table(name = "`sys_cluster_info`")
 public class SysClusterInfo implements Serializable {

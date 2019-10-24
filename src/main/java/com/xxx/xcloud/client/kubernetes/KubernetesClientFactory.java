@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.springframework.stereotype.Component;
 
-import com.xxx.xcloud.common.BdosProperties;
+import com.xxx.xcloud.common.XcloudProperties;
 import com.xxx.xcloud.common.Global;
 
 import io.fabric8.kubernetes.api.model.Doneable;
@@ -38,18 +38,17 @@ public class KubernetesClientFactory {
     private static MixedOperation<Job, JobList, DoneableJob, ScalableResource<Job, DoneableJob>> jobClient;
 
     /**
-     * get kubenetes client
+     * get kubernetes client
      *
      * @return kubernetesClient
      */
     public static XcloudKubernetesClient getClient() {
 
-        if (null != kubernetesClient) {// 即使有问题也不会为null
-
+        if (null != kubernetesClient) {
+            // 即使有问题也不会为null
             return kubernetesClient;
         }
 
-        // init k8s client
         if (new File(KUBERNETES_KUBECONFIG_FILE_PATH).exists()) {
 
             // init by admin.conf (https)
@@ -58,18 +57,17 @@ public class KubernetesClientFactory {
             kubernetesClient = new XcloudKubernetesClient();
         } else {
 
-            // init by masterUtl (http)
-            String kubenetesMasterUrl = getKubenetesMasterUrl();// 获取kubenetesMasterUrl
+            String kubenetesMasterUrl = getKubenetesMasterUrl();
 
             Config config = new ConfigBuilder().withMasterUrl(kubenetesMasterUrl).build();
-            kubernetesClient = new XcloudKubernetesClient(config);// 使用自定义的客户端，可以实现级联删除
+            kubernetesClient = new XcloudKubernetesClient(config);
         }
 
         return kubernetesClient;
     }
 
     /**
-     * 自定义kubenetes客户端，用于实现级联删除
+     * 自定义kubernetes客户端，用于实现级联删除
      *
      * @author HBL
      */
@@ -97,18 +95,19 @@ public class KubernetesClientFactory {
     }
 
     /**
-     * get kubenetes master url
+     * get kubernetes master url
      *
      * @return kubenetesMsterUrl
      */
     public static String getKubenetesMasterUrl() {
 
-        return BdosProperties.getConfigMap().get(Global.KUBENETES_MASTER_URL);
+        return XcloudProperties.getConfigMap().get(Global.KUBENETES_MASTER_URL);
     }
 
     public static MixedOperation<Job, JobList, DoneableJob, ScalableResource<Job, DoneableJob>> getJobs() {
 
-        if (null != jobClient) {// 即使有问题也不会为null
+        if (null != jobClient) {
+            // 即使有问题也不会为null
 
             return jobClient;
         }

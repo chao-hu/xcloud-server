@@ -1,10 +1,10 @@
-/**
- *
- */
 package com.xxx.xcloud.common;
 
 /**
- * @author ruzz
+ * @ClassName: ApiResult
+ * @Description: API 返回的封装对象
+ * @author huchao
+ * @date 2019年10月24日
  *
  */
 public class ApiResult {

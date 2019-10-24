@@ -15,7 +15,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.ceph.fs.CephMount;
 import com.ceph.rados.Rados;
-import com.xxx.xcloud.common.BdosProperties;
+import com.xxx.xcloud.common.XcloudProperties;
 import com.xxx.xcloud.common.Global;
 
 /**
@@ -51,16 +51,16 @@ public class CephClientFactory {
         try {
             // init rgwadmin
             rgwAdmin = new RgwAdminBuilder()
-                    .accessKey(BdosProperties.getConfigMap().get(Global.CEPH_RGW_ADMIN_ACCESSKEY))
-                    .secretKey(BdosProperties.getConfigMap().get(Global.CEPH_RGW_ADMIN_SECRETKEY))
-                    .endpoint("http://" + BdosProperties.getConfigMap().get(Global.CEPH_RGW_ENDPOINT) + "/admin")
+                    .accessKey(XcloudProperties.getConfigMap().get(Global.CEPH_RGW_ADMIN_ACCESSKEY))
+                    .secretKey(XcloudProperties.getConfigMap().get(Global.CEPH_RGW_ADMIN_SECRETKEY))
+                    .endpoint("http://" + XcloudProperties.getConfigMap().get(Global.CEPH_RGW_ENDPOINT) + "/admin")
                     .build();
 
             // init AmazonS3
             ClientConfiguration clientConfiguration = new ClientConfiguration();
             clientConfiguration.setProtocol(Protocol.HTTP);
             conn = new AmazonS3Client(clientConfiguration);
-            conn.setEndpoint(BdosProperties.getConfigMap().get(Global.CEPH_RGW_ENDPOINT));
+            conn.setEndpoint(XcloudProperties.getConfigMap().get(Global.CEPH_RGW_ENDPOINT));
         } catch (Exception e) {
             LOG.error("对象存储客户端初始化异常", e);
         }
@@ -101,9 +101,9 @@ public class CephClientFactory {
 
         // init Cephfile client
         try {
-            cephMount = new CephMount(BdosProperties.getConfigMap().get(Global.CEPH_NAME));
-            cephMount.conf_read_file(BdosProperties.getConfigMap().get(Global.CEPH_SSH_CEPHDIR)
-                    + BdosProperties.getConfigMap().get(Global.CEPH_CONF));
+            cephMount = new CephMount(XcloudProperties.getConfigMap().get(Global.CEPH_NAME));
+            cephMount.conf_read_file(XcloudProperties.getConfigMap().get(Global.CEPH_SSH_CEPHDIR)
+                    + XcloudProperties.getConfigMap().get(Global.CEPH_CONF));
             cephMount.mount("/");
             LOG.info("CephFile客户端初始化成功！");
         } catch (FileNotFoundException e) {
@@ -127,9 +127,9 @@ public class CephClientFactory {
         }
         try {
 
-            cluster = new Rados(BdosProperties.getConfigMap().get(Global.CEPH_NAME));
-            File f = new File(BdosProperties.getConfigMap().get(Global.CEPH_SSH_CEPHDIR)
-                    + BdosProperties.getConfigMap().get(Global.CEPH_CONF));
+            cluster = new Rados(XcloudProperties.getConfigMap().get(Global.CEPH_NAME));
+            File f = new File(XcloudProperties.getConfigMap().get(Global.CEPH_SSH_CEPHDIR)
+                    + XcloudProperties.getConfigMap().get(Global.CEPH_CONF));
             cluster.confReadFile(f);
             cluster.connect();
         } catch (Exception | Error e) {

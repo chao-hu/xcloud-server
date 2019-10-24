@@ -1,7 +1,7 @@
 package com.xxx.xcloud.client.github;
 
 import com.xxx.xcloud.client.rest.ApiClient;
-import com.xxx.xcloud.common.BdosProperties;
+import com.xxx.xcloud.common.XcloudProperties;
 import com.xxx.xcloud.common.Global;
 
 /**
@@ -25,7 +25,7 @@ public class GithubClientFactory {
         if (null == githubApi) {
             synchronized (GithubClientFactory.class) {
                 if (null == githubApi) {
-                    githubApi = ApiClient.getInstance(BdosProperties.getConfigMap().get(Global.GITHUB_API_URL),
+                    githubApi = ApiClient.getInstance(XcloudProperties.getConfigMap().get(Global.GITHUB_API_URL),
                             GithubApi.class, null);
                 }
             }

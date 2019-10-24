@@ -51,6 +51,13 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+/**
+ * @ClassName: HttpUtil
+ * @Description: HttpUtil
+ * @author huchao
+ * @date 2019年10月24日
+ *
+ */
 public class HttpUtil {
     private static final String CODE_UTF8 = "UTF-8";
     private static final String POST_ERROR_MSG = "post请求提交失败:";
@@ -351,8 +358,10 @@ public class HttpUtil {
         if (null != response) {
 
             // 提示框设置
-            response.reset(); // reset the response
-            response.setContentType("application/octet-stream");// 告诉浏览器输出内容为流
+            // reset the response
+            response.reset();
+            // 告诉浏览器输出内容为流
+            response.setContentType("application/octet-stream");
             response.setHeader("content-disposition", "attachment; filename=\"" + logName + "\"");
 
             try {
@@ -360,8 +369,9 @@ public class HttpUtil {
                 InputStream inputStream = new ByteArrayInputStream(str.getBytes());
 
                 BufferedInputStream buff = new BufferedInputStream(inputStream);
-                byte[] aryByte = new byte[1024];// 缓存
-                long k = 0;// 该值用于计算当前实际下载了多少字节
+                byte[] aryByte = new byte[1024];
+                // 该值用于计算当前实际下载了多少字节
+                long k = 0;
                 // 输出流
                 OutputStream out = response.getOutputStream();
                 // 开始循环下载
@@ -424,8 +434,10 @@ public class HttpUtil {
         File zipFile = new File(folder + "/" + logName);
 
         // 提示框设置
-        response.reset(); // reset the response
-        response.setContentType("application/octet-stream");// 告诉浏览器输出内容为流
+        // reset the response
+        response.reset();
+        // 告诉浏览器输出内容为流
+        response.setContentType("application/octet-stream");
         response.setHeader("content-disposition", "attachment; filename=\"" + logName + "\"");
 
         try (ZipOutputStream zout = new ZipOutputStream(new FileOutputStream(zipFile))) {
@@ -465,9 +477,11 @@ public class HttpUtil {
             BufferedInputStream buff;
             inputStream = new ByteArrayInputStream(entity.getValue().getBytes());
             buff = new BufferedInputStream(inputStream);
-            zout.putNextEntry(new ZipEntry(entity.getKey())); // 获取文件名称
-            byte[] aryByte = new byte[1024];// 缓存
-            long k = 0;// 该值用于计算当前实际下载了多少字节
+            // 获取文件名称
+            zout.putNextEntry(new ZipEntry(entity.getKey()));
+            byte[] aryByte = new byte[1024];
+            // 该值用于计算当前实际下载了多少字节
+            long k = 0;
             while (k < entity.getValue().length()) {
                 int j = buff.read(aryByte, 0, 1024);
                 k += j;
@@ -546,16 +560,11 @@ public class HttpUtil {
     /**
      * 关闭输入输出流
      *
-     * @param outputStream
-     *            OutputStream
-     * @param outputStreamWriter
-     *            OutputStreamWriter
-     * @param inputStream
-     *            InputStream
-     * @param inputStreamReader
-     *            InputStreamReader
-     * @param reader
-     *            BufferedReader
+     * @param outputStream OutputStream
+     * @param outputStreamWriter OutputStreamWriter
+     * @param inputStream InputStream
+     * @param inputStreamReader InputStreamReader
+     * @param reader BufferedReader
      * @see IOException
      * @exception IOException
      */

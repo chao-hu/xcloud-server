@@ -15,17 +15,24 @@ import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
-import com.xxx.xcloud.common.BdosProperties;
 import com.xxx.xcloud.common.ReturnCode;
+import com.xxx.xcloud.common.XcloudProperties;
 import com.xxx.xcloud.common.exception.ErrorMessageException;
 import com.xxx.xcloud.module.system.entity.SysClusterInfo;
 import com.xxx.xcloud.module.system.repository.SysClusterInfoRepository;
 
+/**
+ * @ClassName: SystemConfigInit
+ * @Description: 系统启动时， 加载 系统配置信息
+ * @author huchao
+ * @date 2019年10月24日
+ *
+ */
 @Component
 @Order(value = 1)
 public class SystemConfigInit implements CommandLineRunner {
 
-    private static Logger logger = LoggerFactory.getLogger(SystemConfigInit.class); // 日志记录
+    private static Logger logger = LoggerFactory.getLogger(SystemConfigInit.class);
 
     private static String sqlPath = "/opt/server/system.sql";
 
@@ -45,7 +52,7 @@ public class SystemConfigInit implements CommandLineRunner {
             logger.info("-----------sysConfigList----" + JSON.toJSONString(sysConfigList));
 
             for (SysClusterInfo config : sysConfigList) {
-                BdosProperties.getConfigMap().put(config.getCfgKey(), config.getCfgValue());
+                XcloudProperties.getConfigMap().put(config.getCfgKey(), config.getCfgValue());
             }
         } else {
             // 执行SQL脚本插入并再次导入
@@ -64,7 +71,7 @@ public class SystemConfigInit implements CommandLineRunner {
             sysConfigList = sysClusterInfoRepository.findAll();
             if (null != sysConfigList && !sysConfigList.isEmpty()) {
                 for (SysClusterInfo config : sysConfigList) {
-                    BdosProperties.getConfigMap().put(config.getCfgKey(), config.getCfgValue());
+                    XcloudProperties.getConfigMap().put(config.getCfgKey(), config.getCfgValue());
                 }
             } else {
                 throw new ErrorMessageException(ReturnCode.CODE_CHECK_PARAM_IS_NULL, "初始化数据库脚本失败");

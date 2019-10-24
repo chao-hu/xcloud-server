@@ -11,7 +11,7 @@ import org.springframework.util.StringUtils;
 
 import com.bonc.bdos.harbor.client.ApiClient;
 import com.bonc.bdos.harbor.client.api.ProductsApi;
-import com.xxx.xcloud.common.BdosProperties;
+import com.xxx.xcloud.common.XcloudProperties;
 import com.xxx.xcloud.common.Global;
 
 /**
@@ -23,7 +23,7 @@ public class HarborClientFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(HarborClientFactory.class);
 
-    private static ApiClient harborApiClient;// 使用默认的就足够了
+    private static ApiClient harborApiClient;
     private static ProductsApi productsApi;
 
     /**
@@ -45,9 +45,9 @@ public class HarborClientFactory {
      */
     private static void initHarborApiClient() {
 
-        String harborUrl = getHarborUrl();// 获取harbor地址
+        String harborUrl = getHarborUrl();
 
-        if (StringUtils.isEmpty(harborUrl)) {// 获取不到harbor地址，不实例化客户端
+        if (StringUtils.isEmpty(harborUrl)) {
             LOG.warn("实例化harbor客户端异常，获取harbor地址失败");
             return;
         }
@@ -57,7 +57,7 @@ public class HarborClientFactory {
         harborApiClient.setBasePath(harborUrl);
 
         // 添加认证
-        String path = BdosProperties.getConfigMap().get(Global.HARBOR_CRT_PATH);
+        String path = XcloudProperties.getConfigMap().get(Global.HARBOR_CRT_PATH);
         // File caFile = new File("/opt/bdos/harbor-ca.crt");
         File caFile = new File(path);
         InputStream sslCaCert = null;
@@ -68,8 +68,8 @@ public class HarborClientFactory {
         }
 
         harborApiClient.setSslCaCert(sslCaCert);
-        harborApiClient.setUsername(BdosProperties.getConfigMap().get(Global.HARBOR_USERNAME));
-        harborApiClient.setPassword(BdosProperties.getConfigMap().get(Global.HARBOR_PASSWORD));
+        harborApiClient.setUsername(XcloudProperties.getConfigMap().get(Global.HARBOR_USERNAME));
+        harborApiClient.setPassword(XcloudProperties.getConfigMap().get(Global.HARBOR_PASSWORD));
     }
 
     /**
@@ -96,8 +96,8 @@ public class HarborClientFactory {
     public static String getHarborUrl() {
         // return "https://172.16.3.50:8443/api";
         LOG.info("-------HarborUrl-------" + "http://"
-                + BdosProperties.getConfigMap().get(Global.HARBOR_REGISTRY_ADDRESS) + "/api");
-        return "https://" + BdosProperties.getConfigMap().get(Global.HARBOR_REGISTRY_ADDRESS) + "/api";
+                + XcloudProperties.getConfigMap().get(Global.HARBOR_REGISTRY_ADDRESS) + "/api");
+        return "https://" + XcloudProperties.getConfigMap().get(Global.HARBOR_REGISTRY_ADDRESS) + "/api";
     }
 
 }

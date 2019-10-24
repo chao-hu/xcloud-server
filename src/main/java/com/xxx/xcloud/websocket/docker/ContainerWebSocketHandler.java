@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -18,10 +19,12 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.dockerjava.api.command.ExecCreateCmdResponse;
-import com.xxx.xcloud.common.BdosProperties;
+import com.xxx.xcloud.client.kubernetes.KubernetesClientFactory;
 import com.xxx.xcloud.common.Global;
+import com.xxx.xcloud.common.XcloudProperties;
 import com.xxx.xcloud.utils.HttpUtil;
 
+import io.fabric8.kubernetes.api.model.ContainerStatus;
 import io.fabric8.kubernetes.api.model.Pod;
 
 /**
@@ -33,6 +36,12 @@ import io.fabric8.kubernetes.api.model.Pod;
 public class ContainerWebSocketHandler extends TextWebSocketHandler {
 
     private static Logger logger = LoggerFactory.getLogger(ContainerWebSocketHandler.class);
+
+    private static String VERSION_PREFIX = "v";
+
+    private static String SESSION_KEY = "execId";
+
+    private static String SESSION_HASH = "relationSign";
 
     /**
      * Map for all docker connection.
@@ -108,9 +117,9 @@ public class ContainerWebSocketHandler extends TextWebSocketHandler {
     }
 
     private void resizeTty(String hostIp, String width, String height, String execId) {
-        int wsPort = Integer.valueOf(BdosProperties.getConfigMap().get(Global.DOCKER_DAEMON_PORT));
-        String version = String.valueOf(BdosProperties.getConfigMap().get(Global.DOCKER_API_VERSION));
-        if (StringUtils.isNotEmpty(version) && version.indexOf("v") < 0) {
+        int wsPort = Integer.valueOf(XcloudProperties.getConfigMap().get(Global.DOCKER_DAEMON_PORT));
+        String version = String.valueOf(XcloudProperties.getConfigMap().get(Global.DOCKER_API_VERSION));
+        if (StringUtils.isNotEmpty(version) && version.indexOf(VERSION_PREFIX) < 0) {
             version = "v" + version;
         }
         String resize = "resize?h=" + height + "&w=" + width;
@@ -134,15 +143,14 @@ public class ContainerWebSocketHandler extends TextWebSocketHandler {
 
         // Get msg from session or k8s.
         if (StringUtils.isEmpty(hostIp) || StringUtils.isEmpty(containerId)) {
-            // try {
-            // Pod pod =
-            // KubernetesClientFactory.getClient().inNamespace(tenantName).pods().withName(podName).get();
-            // hostIp = pod.getStatus().getHostIP();
-            // containerId = getContainerId(pod, appType);
-            // } catch (Exception e) {
-            // logger.error("k8s获取pod失败", e);
-            // return null;
-            // }
+            try {
+                Pod pod = KubernetesClientFactory.getClient().inNamespace(tenantName).pods().withName(podName).get();
+                hostIp = pod.getStatus().getHostIP();
+                containerId = getContainerId(pod, appType);
+            } catch (Exception e) {
+                logger.error("k8s获取pod失败", e);
+                return null;
+            }
         }
 
         map.put("hostIp", hostIp);
@@ -164,35 +172,32 @@ public class ContainerWebSocketHandler extends TextWebSocketHandler {
      */
     private String getContainerId(Pod pod, String apptype) {
         String containerId = null;
-        // List<ContainerStatus> containerStatuses =
-        // pod.getStatus().getContainerStatuses();
-        // if (null != containerStatuses && containerStatuses.size() > 1) {
-        // for (ContainerStatus status : containerStatuses) {
-        // if (null != apptype && apptype.equals(CommonConst.APPTYPE_YARN)
-        // && status.getName().equals("kubernetes-hadoop")) {
-        // containerId = status.getContainerID().replace("docker://", "");
-        // }
-        // if (null != apptype && apptype.equals(CommonConst.APPTYPE_ZK) &&
-        // status.getName().equals("zk")) {
-        // containerId = status.getContainerID().replace("docker://", "");
-        // }
-        // if (null != apptype &&
-        // Arrays.asList(CommonConst.FRAMEWORK_TYPE_SERVER).contains(apptype)
-        // && status.getName().equals(apptype + "-server")) {
-        // containerId = status.getContainerID().replace("docker://", "");
-        // }
-        //
-        // if (null != apptype &&
-        // Arrays.asList(CommonConst.FRAMEWORK_TYPE).contains(apptype)
-        // && status.getName().equals(apptype)) {
-        // containerId = status.getContainerID().replace("docker://", "");
-        // }
-        // }
-        // } else {
-        // containerId =
-        // pod.getStatus().getContainerStatuses().get(0).getContainerID().replace("docker://",
-        // "");
-        // }
+        List<ContainerStatus> containerStatuses = pod.getStatus().getContainerStatuses();
+        if (null != containerStatuses && containerStatuses.size() > 1) {
+            // for (ContainerStatus status : containerStatuses) {
+            // if (null != apptype && apptype.equals(CommonConst.APPTYPE_YARN)
+            // && status.getName().equals("kubernetes-hadoop")) {
+            // containerId = status.getContainerID().replace("docker://", "");
+            // }
+            // if (null != apptype && apptype.equals(CommonConst.APPTYPE_ZK) &&
+            // status.getName().equals("zk")) {
+            // containerId = status.getContainerID().replace("docker://", "");
+            // }
+            // if (null != apptype &&
+            // Arrays.asList(CommonConst.FRAMEWORK_TYPE_SERVER).contains(apptype)
+            // && status.getName().equals(apptype + "-server")) {
+            // containerId = status.getContainerID().replace("docker://", "");
+            // }
+            //
+            // if (null != apptype &&
+            // Arrays.asList(CommonConst.FRAMEWORK_TYPE).contains(apptype)
+            // && status.getName().equals(apptype)) {
+            // containerId = status.getContainerID().replace("docker://", "");
+            // }
+            // }
+        } else {
+            containerId = pod.getStatus().getContainerStatuses().get(0).getContainerID().replace("docker://", "");
+        }
 
         return containerId;
     }
@@ -269,7 +274,7 @@ public class ContainerWebSocketHandler extends TextWebSocketHandler {
      */
     private Socket connectExec(String ip, String execId) throws IOException {
 
-        int wsPort = Integer.valueOf(BdosProperties.getConfigMap().get(Global.DOCKER_DAEMON_PORT));
+        int wsPort = Integer.valueOf(XcloudProperties.getConfigMap().get(Global.DOCKER_DAEMON_PORT));
 
         Socket socket = new Socket(ip, wsPort);
         socket.setKeepAlive(true);
@@ -350,13 +355,13 @@ public class ContainerWebSocketHandler extends TextWebSocketHandler {
             return;
         }
 
-        if (null == session.getAttributes().get("execId") || null == session.getAttributes().get("relationSign")) {
+        if (null == session.getAttributes().get(SESSION_KEY) || null == session.getAttributes().get(SESSION_HASH)) {
 
             return;
         }
 
-        String execId = session.getAttributes().get("execId").toString();
-        String relationSign = session.getAttributes().get("relationSign").toString();
+        String execId = session.getAttributes().get(SESSION_KEY).toString();
+        String relationSign = session.getAttributes().get(SESSION_HASH).toString();
         ExecSession execSession = execSessionMap.get(execId);
 
         try {
@@ -385,7 +390,7 @@ public class ContainerWebSocketHandler extends TextWebSocketHandler {
      */
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        String execId = session.getAttributes().get("execId").toString();
+        String execId = session.getAttributes().get(SESSION_KEY).toString();
         ExecSession execSession = execSessionMap.get(execId);
         OutputStream out = execSession.getSocket().getOutputStream();
         out.write(message.asBytes());

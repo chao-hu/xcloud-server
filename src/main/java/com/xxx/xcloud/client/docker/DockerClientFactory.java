@@ -4,7 +4,7 @@ import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.DockerClientConfig;
-import com.xxx.xcloud.common.BdosProperties;
+import com.xxx.xcloud.common.XcloudProperties;
 import com.xxx.xcloud.common.Global;
 import com.xxx.xcloud.common.ReturnCode;
 import com.xxx.xcloud.common.exception.ErrorMessageException;
@@ -56,10 +56,10 @@ public class DockerClientFactory {
         DockerClient dockerClient = null;
         try {
             DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
-                    .withDockerHost(BdosProperties.getConfigMap().get(Global.DOCKER_URL))
-                    .withApiVersion(BdosProperties.getConfigMap().get(Global.DOCKER_API_VERSION))
+                    .withDockerHost(XcloudProperties.getConfigMap().get(Global.DOCKER_URL))
+                    .withApiVersion(XcloudProperties.getConfigMap().get(Global.DOCKER_API_VERSION))
                     .withRegistryUsername(username).withRegistryPassword(password).withRegistryEmail(email)
-                    .withRegistryUrl("http://" + BdosProperties.getConfigMap().get(Global.HARBOR_REGISTRY_ADDRESS))
+                    .withRegistryUrl("http://" + XcloudProperties.getConfigMap().get(Global.HARBOR_REGISTRY_ADDRESS))
                     .build();
             dockerClient = DockerClientBuilder.getInstance(config).build();
         } catch (Exception e) {
@@ -82,12 +82,12 @@ public class DockerClientFactory {
         try {
             DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
                     .withDockerHost(
-                            "tcp" + "://" + nodeIp + ":" + BdosProperties.getConfigMap().get(Global.DOCKER_DAEMON_PORT))
-                    .withApiVersion(BdosProperties.getConfigMap().get(Global.DOCKER_API_VERSION))
-                    .withRegistryUsername(BdosProperties.getConfigMap().get(Global.HARBOR_USERNAME))
-                    .withRegistryPassword(BdosProperties.getConfigMap().get(Global.HARBOR_PASSWORD))
-                    .withRegistryEmail(BdosProperties.getConfigMap().get(Global.HARBOR_EMAIL))
-                    .withRegistryUrl("http://" + BdosProperties.getConfigMap().get(Global.HARBOR_REGISTRY_ADDRESS))
+                            "tcp" + "://" + nodeIp + ":" + XcloudProperties.getConfigMap().get(Global.DOCKER_DAEMON_PORT))
+                    .withApiVersion(XcloudProperties.getConfigMap().get(Global.DOCKER_API_VERSION))
+                    .withRegistryUsername(XcloudProperties.getConfigMap().get(Global.HARBOR_USERNAME))
+                    .withRegistryPassword(XcloudProperties.getConfigMap().get(Global.HARBOR_PASSWORD))
+                    .withRegistryEmail(XcloudProperties.getConfigMap().get(Global.HARBOR_EMAIL))
+                    .withRegistryUrl("http://" + XcloudProperties.getConfigMap().get(Global.HARBOR_REGISTRY_ADDRESS))
                     .build();
             dockerClient = DockerClientBuilder.getInstance(config).build();
         } catch (Exception e) {
@@ -104,7 +104,7 @@ public class DockerClientFactory {
      */
     public static String getDockerRegistryUrl() {
 
-        return "http://" + BdosProperties.getConfigMap().get(Global.HARBOR_REGISTRY_ADDRESS);
+        return "http://" + XcloudProperties.getConfigMap().get(Global.HARBOR_REGISTRY_ADDRESS);
     }
 
 }
