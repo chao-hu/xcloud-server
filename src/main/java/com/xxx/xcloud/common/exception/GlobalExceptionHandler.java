@@ -6,8 +6,10 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,7 +20,7 @@ import com.xxx.xcloud.common.ReturnCode;
 
 /**
  * 全局异常处理类
- * 
+ *
  * @author mengaijun
  * @Description: TODO
  * @date: 2019年2月28日 下午5:49:07
@@ -27,7 +29,7 @@ import com.xxx.xcloud.common.ReturnCode;
 public class GlobalExceptionHandler {
     /**
      * 用来处理bean validation异常
-     * 
+     *
      * @param ex
      * @return
      */
@@ -54,7 +56,7 @@ public class GlobalExceptionHandler {
 
     /**
      * 用来处理参数 validation异常
-     * 
+     *
      * @param ex
      * @return
      */
@@ -78,4 +80,13 @@ public class GlobalExceptionHandler {
         apiResult.setMessage(ex.getMessage());
         return apiResult;
     }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    @ResponseBody
+    public ApiResult resolveHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
+        ApiResult apiResult = new ApiResult(HttpStatus.METHOD_NOT_ALLOWED.value(), "");
+        apiResult.setMessage(ex.getMessage());
+        return apiResult;
+    }
+
 }

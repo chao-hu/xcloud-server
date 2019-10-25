@@ -57,7 +57,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jdbc</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>jstl</artifactId>
@@ -79,7 +82,7 @@
 			<artifactId>fastjson</artifactId>
 			<version>1.2.62</version>
 		</dependency>
-		<!-- com.alibaba.fastjson end --> 
+		<!-- com.alibaba.fastjson end -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -105,7 +108,7 @@
 			<artifactId>harbor.client</artifactId>
 			<version>1.6.1-0.0.2</version><!-- 对应harbor的1.6.1版本 -->
 		</dependency>
-		
+
 		<!-- Swagger -->
 		<dependency>
 			<groupId>io.springfox</groupId>
@@ -117,9 +120,9 @@
 			<artifactId>springfox-swagger-ui</artifactId>
 			<version>2.6.1</version>
 		</dependency>
-		
+
 		<!-- Swagger end -->
-		
+
 		<!-- docker-java引用的jackson版本为3.0.3，springboot引用的jackson版本为2.6.3 ，使用时候有冲突，下面处理为统一版本为2.6.3 -->
 		<!-- kubernetes api依赖的jersey在dockerjava中已经引用 -->
 		<dependency>
@@ -127,9 +130,9 @@
 			<artifactId>docker-java</artifactId>
 			<version>3.0.3</version>
 		</dependency>
-		
+
 		<!-- docker-java end -->
-		
+
 
 		<!-- feign -->
 		<dependency>
@@ -142,6 +145,28 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
+
+		<!-- ceph -->
+		<dependency>
+			<groupId>com.ceph</groupId>
+			<artifactId>libcephfs</artifactId>
+			<version>0.80.5</version>
+		</dependency>
+		<dependency>
+			<groupId>com.ceph</groupId>
+			<artifactId>rados</artifactId>
+			<version>0.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.twonote</groupId>
+			<artifactId>radosgw-admin4j</artifactId>
+			<version>1.0.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-s3</artifactId>
+			<version>1.11.298</version>
 		</dependency>
 
 	</dependencies>

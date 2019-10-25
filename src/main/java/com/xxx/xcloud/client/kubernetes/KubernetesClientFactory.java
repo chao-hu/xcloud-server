@@ -4,8 +4,8 @@ import java.io.File;
 
 import org.springframework.stereotype.Component;
 
-import com.xxx.xcloud.common.XcloudProperties;
 import com.xxx.xcloud.common.Global;
+import com.xxx.xcloud.common.XcloudProperties;
 
 import io.fabric8.kubernetes.api.model.Doneable;
 import io.fabric8.kubernetes.api.model.HasMetadata;
@@ -76,13 +76,11 @@ public class KubernetesClientFactory {
         /**
          * cascading delete default is false
          */
-        @SuppressWarnings("rawtypes")
         @Override
         public <T extends HasMetadata, L extends KubernetesResourceList, D extends Doneable<T>> MixedOperation<T, L, D, Resource<T, D>> customResources(
                 CustomResourceDefinition crd, Class<T> resourceType, Class<L> listClass, Class<D> doneClass) {
 
-            return new CustomResourceOperationsImpl<T, L, D>(httpClient, getConfiguration(), crd, resourceType,
-                    listClass, doneClass);
+            return new CustomResourceOperationsImpl<T, L, D>(httpClient, getConfiguration());
         }
 
         public XcloudKubernetesClient(Config config) throws KubernetesClientException {
