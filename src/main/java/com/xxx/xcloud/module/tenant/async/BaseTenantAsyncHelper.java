@@ -54,10 +54,6 @@ public class BaseTenantAsyncHelper {
         tenantOptLogRepository.save(optLog);
     }
 
-    public void saveTenantOpt(String optId) {
-
-    }
-
     public void deleteTenantOpt(String tenantName, String opt) {
 
         TenantOptLog optLog = tenantOptLogRepository.findByTenantNameAndOpt(tenantName, opt);
@@ -66,10 +62,6 @@ public class BaseTenantAsyncHelper {
 
             tenantOptLogRepository.delete(optLog);
         }
-    }
-
-    public void deleteTenantOpt(String optId) {
-
     }
 
     public void saveTenant(String tenantName, String key, Object val) {
@@ -89,4 +81,11 @@ public class BaseTenantAsyncHelper {
         tenantRepository.save(tenant);
     }
 
+    public String buildOpt() {
+
+        String className = this.getClass().getName();
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+
+        return className + "." + methodName;
+    }
 }

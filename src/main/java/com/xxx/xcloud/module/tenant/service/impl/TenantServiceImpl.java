@@ -12,6 +12,13 @@ import com.xxx.xcloud.module.tenant.entity.Tenant;
 import com.xxx.xcloud.module.tenant.repository.TenantRepository;
 import com.xxx.xcloud.module.tenant.service.ITenantService;
 
+/**
+ * @ClassName: TenantServiceImpl
+ * @Description: TenantServiceImpl
+ * @author huchao
+ * @date 2019年10月25日
+ *
+ */
 @Service
 public class TenantServiceImpl implements ITenantService {
 
@@ -42,6 +49,7 @@ public class TenantServiceImpl implements ITenantService {
             tenantRepository.save(obj);
         }
 
+        afterCreateTenant(tenantName);
         logger.debug("create tenant " + tenantName);
         return obj;
     }
@@ -63,6 +71,7 @@ public class TenantServiceImpl implements ITenantService {
             tenantRepository.delete(obj);
         }
 
+        afterDelTenant(tenantName);
         logger.debug("delete tenant " + tenantName);
     }
 
@@ -80,4 +89,7 @@ public class TenantServiceImpl implements ITenantService {
         return tenantRepository.findByTenantName(tenantName);
     }
 
+    public void afterCreateTenant(String tenantName) {};
+
+    public void afterDelTenant(String tenantName) {};
 }

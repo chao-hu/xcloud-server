@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SleepUtil {
 
-    private static Logger logger = LoggerFactory.getLogger(SleepUtil.class); // 日志记录
+    private static Logger logger = LoggerFactory.getLogger(SleepUtil.class);
 
     private SleepUtil() {}
 

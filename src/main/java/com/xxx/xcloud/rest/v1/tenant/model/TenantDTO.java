@@ -10,12 +10,15 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
- * @author ruzz
+ * @ClassName: TenantDTO
+ * @Description: 租户请求模型
+ * @author huchao
+ * @date 2019年10月25日
  *
  */
 @ApiModel(value = "租户请求模型")
 @Data
-public class TenantMO {
+public class TenantDTO {
 
     @ApiModelProperty(value = "租户名称", required = true, example = "testtenant", dataType = "String")
     @Pattern(regexp = Global.CHECK_TENANT_NAME, message = "租户名称规则不符合规范")

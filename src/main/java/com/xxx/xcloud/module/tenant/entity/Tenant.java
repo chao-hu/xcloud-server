@@ -29,18 +29,18 @@ public class Tenant implements Serializable {
     @GeneratedValue(generator = "uuidGenerator")
     private String id;
 
-    @Column(name = "`TENANT_NAME`", unique = true) // 租户名称
+    @Column(name = "`TENANT_NAME`", unique = true)
     private String tenantName;
 
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    @Column(name = "`CREATE_TIME`") // 创建时间
+    @Column(name = "`CREATE_TIME`")
     private Date createTime;
 
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    @Column(name = "`UPDATE_TIME`") // 更新时间
+    @Column(name = "`UPDATE_TIME`")
     private Date updateTime;
 
-    @Column(name = "`OPERATOR_INFO`") // 创建过程状态
+    @Column(name = "`OPERATOR_INFO`")
     private String operatorInfo;
 
     public String getId() {

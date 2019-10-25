@@ -26,7 +26,7 @@ import com.xxx.xcloud.common.Global;
 import com.xxx.xcloud.common.ReturnCode;
 import com.xxx.xcloud.module.tenant.entity.Tenant;
 import com.xxx.xcloud.module.tenant.service.ITenantService;
-import com.xxx.xcloud.rest.v1.tenant.model.TenantMO;
+import com.xxx.xcloud.rest.v1.tenant.model.TenantDTO;
 
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -44,19 +44,19 @@ import io.swagger.annotations.ApiOperation;
 public class TenantController {
 
     @Autowired
-    ITenantService tenantService;
+    ITenantService tenantServiceImplV1;
 
     @ResponseBody
     @RequestMapping(value = { "" }, method = RequestMethod.POST)
     @ApiOperation(value = "创建租户", notes = "")
-    public ApiResult createTenant(@Valid @RequestBody TenantMO obj, BindingResult result) {
+    public ApiResult createTenant(@Valid @RequestBody TenantDTO obj, BindingResult result) {
 
         String tenantName = obj.getTenantName();
 
-        Tenant tenant = tenantService.findTenantByTenantName(tenantName);
+        Tenant tenant = tenantServiceImplV1.findTenantByTenantName(tenantName);
         if (null == tenant) {
 
-            tenant = tenantService.createTenant(tenantName);
+            tenant = tenantServiceImplV1.createTenant(tenantName);
         }
 
         return new ApiResult(ReturnCode.CODE_SUCCESS, tenant, "创建租户成功");
@@ -69,7 +69,7 @@ public class TenantController {
     public ApiResult findTenant(
             @Pattern(regexp = Global.CHECK_TENANT_NAME, message = "租户名称规则不符合规范") @PathVariable("tenantName") String tenantName) {
 
-        Tenant tenant = tenantService.findTenantByTenantName(tenantName);
+        Tenant tenant = tenantServiceImplV1.findTenantByTenantName(tenantName);
         if (null == tenant) {
 
             return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NOT_EXIST, "租户不存在");
@@ -85,10 +85,10 @@ public class TenantController {
     public ApiResult deleteTenant(
             @Pattern(regexp = Global.CHECK_TENANT_NAME, message = "租户名称规则不符合规范") @PathVariable("tenantName") String tenantName) {
 
-        Tenant tenant = tenantService.findTenantByTenantName(tenantName);
+        Tenant tenant = tenantServiceImplV1.findTenantByTenantName(tenantName);
         if (null != tenant) {
 
-            tenantService.deleteTenant(tenantName);
+            tenantServiceImplV1.deleteTenant(tenantName);
         }
 
         return new ApiResult(ReturnCode.CODE_SUCCESS, tenant, "删除租户成功");
