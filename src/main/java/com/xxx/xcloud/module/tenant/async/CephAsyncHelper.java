@@ -23,20 +23,21 @@ public class CephAsyncHelper extends BaseTenantAsyncHelper {
     @Async
     public void addCephSecret(String tenantName) {
 
+        String opt = "cephAsyncHelper#addCephSecret";
     }
 
     @Async
     public void delCephSecret(String tenantName) {
-
+        String opt = "cephAsyncHelper#delCephSecret";
     }
 
     @Async
     public void addCephNamespace(String tenantName) {
-
+        String opt = "cephAsyncHelper#addCephNamespace";
     }
 
     @Async
     public void delCephNamespace(String tenantName) {
-
+        String opt = "cephAsyncHelper#delCephNamespace";
     }
 }

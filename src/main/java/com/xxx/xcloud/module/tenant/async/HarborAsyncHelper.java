@@ -24,30 +24,32 @@ public class HarborAsyncHelper extends BaseTenantAsyncHelper {
     @Async
     public void addHarborUser(String tenantName) {
 
+        String opt = "harborAsyncHelper#addHarborUser";
     }
 
     @Async
     public void delHarborUser(String tenantName) {
 
+        String opt = "harborAsyncHelper#delHarborUser";
     }
 
     @Async
     public void addHarborProject(String tenantName) {
-
+        String opt = "harborAsyncHelper#addHarborProject";
     }
 
     @Async
     public void delHarborProject(String tenantName) {
-
+        String opt = "harborAsyncHelper#delHarborProject";
     }
 
     @Async
     public void addHarborSecret(String tenantName) {
-
+        String opt = "k8sAsyncHelper#addHarborSecret";
     }
 
     @Async
     public void delHarborSecret(String tenantName) {
-
+        String opt = "harborAsyncHelper#delHarborSecret";
     }
 }

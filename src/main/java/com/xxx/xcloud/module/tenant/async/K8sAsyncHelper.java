@@ -26,39 +26,50 @@ public class K8sAsyncHelper extends BaseTenantAsyncHelper {
     @Async
     public void addK8sNamespace(String tenantName) {
 
-        Namespace namespace = KubernetesClientFactory.getClient().namespaces().withName(tenantName).get();
-        if (null == namespace) {
-            namespace = KubernetesClientFactory.getClient().namespaces().createNew().withNewMetadata()
-                    .withName(tenantName).endMetadata().done();
-        }
+        String opt = "k8sAsyncHelper#addK8sNamespace";
 
-        if (null == namespace) {
+        try {
 
-            saveTenantOpt(tenantName, buildOpt());
-            logger.debug("租户 " + tenantName + " k8s创建namespace " + tenantName + " 失败!");
-        } else {
+            Namespace namespace = KubernetesClientFactory.getClient().namespaces().withName(tenantName).get();
+            if (null == namespace) {
+                namespace = KubernetesClientFactory.getClient().namespaces().createNew().withNewMetadata()
+                        .withName(tenantName).endMetadata().done();
+            }
 
-            saveTenant(tenantName, OPT_K8S_NAMESPACE_KEY, true);
-            deleteTenantOpt(tenantName, buildOpt());
+            if (null == namespace) {
 
-            logger.debug("租户 " + tenantName + " k8s创建namespace " + tenantName + " 成功!");
+                saveTenantOpt(tenantName, opt);
+                logger.error("租户 " + tenantName + " k8s创建namespace " + tenantName + " 失败!");
+            } else {
+
+                saveTenant(tenantName, OPT_K8S_NAMESPACE_KEY, true);
+                deleteTenantOpt(tenantName, opt);
+
+                logger.error("租户 " + tenantName + " k8s创建namespace " + tenantName + " 成功!");
+            }
+
+        } catch (Exception e) {
+
+            logger.error("k8s 操作失败", e);
+            saveTenantOpt(tenantName, opt);
+            logger.error("租户 " + tenantName + " k8s创建namespace " + tenantName + " 失败!");
         }
 
     }
 
     @Async
     public void delK8sNamespace(String tenantName) {
-
+        String opt = "k8sAsyncHelper#delK8sNamespace";
         try {
 
             KubernetesClientFactory.getClient().namespaces().withName(tenantName).cascading(true).delete();
 
-            deleteTenantOpt(tenantName, buildOpt());
+            deleteTenantOpt(tenantName, opt);
 
             logger.debug("租户 " + tenantName + " k8s删除namespace " + tenantName + " 成功!");
         } catch (Exception e) {
 
-            saveTenantOpt(tenantName, buildOpt());
+            saveTenantOpt(tenantName, opt);
             logger.debug("租户 " + tenantName + " k8s删除namespace " + tenantName + " 失败!");
         }
     }

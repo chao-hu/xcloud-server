@@ -53,7 +53,7 @@ public class AsyncConfig implements AsyncConfigurer {
     class LogException implements AsyncUncaughtExceptionHandler {
         @Override
         public void handleUncaughtException(Throwable throwable, Method method, Object... obj) {
-            logger.error("Exception occurs in async method", throwable.getMessage());
+            logger.error("Exception occurs in async method" + throwable.getLocalizedMessage(), throwable.getMessage());
         }
     }
 

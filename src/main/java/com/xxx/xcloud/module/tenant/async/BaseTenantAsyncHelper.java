@@ -32,6 +32,8 @@ public class BaseTenantAsyncHelper {
     @Autowired
     TenantRepository tenantRepository;
 
+    public static String OPT_SEPAEATOR = "#";
+
     public void saveTenantOpt(String tenantName, String opt) {
 
         TenantOptLog optLog = tenantOptLogRepository.findByTenantNameAndOpt(tenantName, opt);
@@ -81,11 +83,4 @@ public class BaseTenantAsyncHelper {
         tenantRepository.save(tenant);
     }
 
-    public String buildOpt() {
-
-        String className = this.getClass().getName();
-        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-
-        return className + "." + methodName;
-    }
 }

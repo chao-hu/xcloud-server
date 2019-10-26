@@ -85,12 +85,22 @@ public class Tenant implements Serializable {
 
     @JSONField(serialize = false)
     public JSONObject getOperatorInfoJson() {
-        return JSON.parseObject(operatorInfo);
+
+        JSONObject json = JSON.parseObject(operatorInfo);
+
+        if (null == json) {
+
+            json = new JSONObject();
+        }
+        return json;
     }
 
     public void addOrReplaceOperatorInfo(String key, Object obj) {
 
         JSONObject json = JSON.parseObject(operatorInfo);
+        if (null == json) {
+            json = new JSONObject();
+        }
         json.put(key, obj);
 
         operatorInfo = json.toJSONString();

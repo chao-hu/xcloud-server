@@ -30,7 +30,7 @@ public class TenantOptLog implements Serializable {
     @GeneratedValue(generator = "uuidGenerator")
     private String id;
 
-    @Column(name = "`TENANT_NAME`", unique = true)
+    @Column(name = "`TENANT_NAME`")
     private String tenantName;
 
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")

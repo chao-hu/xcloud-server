@@ -27,6 +27,8 @@ public class FtpAsyncHelper extends BaseTenantAsyncHelper {
     @Async
     public void addFtpPath(String tenantName) {
 
+        String opt = "ftpAsyncHelper#addFtpPath";
+
         String path = XcloudProperties.getConfigMap().get(Global.FTP_PATH) + FtpUtils.FTP_SEPARATOR + tenantName;
         String ciPath = path + FtpUtils.FTP_SEPARATOR + "ci";
         String imagePath = path + FtpUtils.FTP_SEPARATOR + "image";
@@ -44,13 +46,13 @@ public class FtpAsyncHelper extends BaseTenantAsyncHelper {
             FtpUtils.createDir(imagePath, ftpClient);
 
             saveTenant(tenantName, OPT_FTP_KEY, true);
-            deleteTenantOpt(tenantName, buildOpt());
+            deleteTenantOpt(tenantName, opt);
 
             logger.debug("租户 " + tenantName + " 建立  ftp目录 " + path + " 成功!");
         } catch (Exception e) {
 
             logger.error(e.getMessage(), e);
-            saveTenantOpt(tenantName, buildOpt());
+            saveTenantOpt(tenantName, opt);
 
             logger.debug("租户 " + tenantName + " 建立  ftp目录 " + path + " 失败!");
         }
@@ -63,6 +65,8 @@ public class FtpAsyncHelper extends BaseTenantAsyncHelper {
     @Async
     public void delFtpPath(String tenantName) {
 
+        String opt = "ftpAsyncHelper#delFtpPath";
+
         FTPClient ftpClient = null;
         ftpClient = FtpUtils.initFtpClient();
 
@@ -71,12 +75,12 @@ public class FtpAsyncHelper extends BaseTenantAsyncHelper {
 
         if (!res) {
 
-            saveTenantOpt(tenantName, buildOpt());
+            saveTenantOpt(tenantName, opt);
 
             logger.debug("租户 " + tenantName + " 删除  ftp目录 " + path + " 失败!");
         } else {
 
-            deleteTenantOpt(tenantName, buildOpt());
+            deleteTenantOpt(tenantName, opt);
             logger.debug("租户 " + tenantName + " 删除  ftp目录 " + path + " 成功!");
         }
     }
