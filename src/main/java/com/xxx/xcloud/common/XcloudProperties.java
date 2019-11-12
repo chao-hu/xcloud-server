@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @ClassName: BdosProperties
+ * @ClassName: XcloudProperties
  * @Description: 系统配置类
  * @author huchao
  * @date 2019年10月24日

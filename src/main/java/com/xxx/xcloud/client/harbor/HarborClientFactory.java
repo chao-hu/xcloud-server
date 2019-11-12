@@ -1,18 +1,17 @@
 package com.xxx.xcloud.client.harbor;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-
+import com.bonc.bdos.harbor.client.ApiClient;
+import com.bonc.bdos.harbor.client.api.ProductsApi;
+import com.xxx.xcloud.common.Global;
+import com.xxx.xcloud.common.XcloudProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.bonc.bdos.harbor.client.ApiClient;
-import com.bonc.bdos.harbor.client.api.ProductsApi;
-import com.xxx.xcloud.common.XcloudProperties;
-import com.xxx.xcloud.common.Global;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 /**
  * 用于获取harborClient

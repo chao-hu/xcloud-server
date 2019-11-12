@@ -619,4 +619,19 @@ public class ReturnCode {
      * @Fields: 系统错误
      */
     public static final int CODE_CLUSTER_SYSTEM_ERROR = 1519;
+
+    /**
+     * // xcloud删除Job失败
+     */
+    public static final int CODE_XCLOUD_DELETE_JOB_FAILED = 1405;
+
+    /**
+     * // xcloud停止job失败
+     */
+    public static final int CODE_XCLOUD_STOP_JOB_FAILED = 1406;
+
+    /**
+     * // xcloud注册代码信息失败
+     */
+    public static final int CODE_XCLOUD_REGISTER_CREDENTIALS_FAILED = 1407;
 }

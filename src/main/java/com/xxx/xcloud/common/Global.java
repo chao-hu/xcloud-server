@@ -67,7 +67,7 @@ public class Global {
      */
     public static final int HARBOR_PROJECT_ROLE_DEVELOPER = 2;
     /**
-     * @Fields:  harbor 用户在project中的角色 visitor
+     * @Fields: harbor 用户在project中的角色 visitor
      */
     public static final int HARBOR_PROJECT_ROLE_VISITOR = 3;
 
@@ -111,6 +111,8 @@ public class Global {
      * @Fields: 升级失败
      */
     public static final byte OPERATION_UPDATE_FAILED = 7;
+
+    public static final String DEVOPS_PLUGIN_GRADLE = "DEVOPS_PLUGIN_GRADLE";//DEVOPSGRADLE插件版本
 
     /**
      *  服务亲和状态
@@ -248,11 +250,12 @@ public class Global {
     /**
      * @Fields: ingress域
      */
-    private static final List<String> INGRESS_DOMAIN_TYPE = Arrays.asList("cn", "ren", "wang", "citic", "top", "sohu",
-            "xin", "com", "net", "xyz", "vip", "work", "law", "beer", "club", "shop", "site", "ink", "info", "mobi",
-            "red", "pro", "kim", "ltd", "group", "auto", "link", "biz", "fun", "online", "store", "tech", "art",
-            "design", "wiki", "love", "center", "video", "social", "team", "show", "cool", "zone", "world", "today",
-            "city", "chat", "company", "live", "fund", "gold", "plus", "guru", "run", "pub", "email", "life");
+    private static final List<String> INGRESS_DOMAIN_TYPE = Arrays
+            .asList("cn", "ren", "wang", "citic", "top", "sohu", "xin", "com", "net", "xyz", "vip", "work", "law",
+                    "beer", "club", "shop", "site", "ink", "info", "mobi", "red", "pro", "kim", "ltd", "group", "auto",
+                    "link", "biz", "fun", "online", "store", "tech", "art", "design", "wiki", "love", "center", "video",
+                    "social", "team", "show", "cool", "zone", "world", "today", "city", "chat", "company", "live",
+                    "fund", "gold", "plus", "guru", "run", "pub", "email", "life");
 
     /**
      * @Title: getIngressDomainType
@@ -315,7 +318,7 @@ public class Global {
      */
     public static final String FTP_HOST = "FTP_HOST";
     /**
-     * @Fields:  ceph挂载命令
+     * @Fields: ceph挂载命令
      */
     public static final String CEPH_SSH_MOUNTEXEC = "CEPH_SSH_MOUNTEXEC";
     /**
@@ -355,11 +358,11 @@ public class Global {
      */
     public static final String DOCKER_DAEMON_APIVERSION = "DOCKER_DAEMON_APIVERSION";
     /**
-     * @Fields:  DOCKER端口
+     * @Fields: DOCKER端口
      */
     public static final String DOCKER_DAEMON_PORT = "DOCKER_DAEMON_PORT";
     /**
-     * @Fields:  ceph挂载路径
+     * @Fields: ceph挂载路径
      */
     public static final String CEPH_SSH_MOUNTPOINT = "CEPH_SSH_MOUNTPOINT";
     /**
@@ -436,7 +439,7 @@ public class Global {
      */
     public static final String SONAR_QUALITYFILE_NAME_SYSTEM = "SONAR_QUALITYFILE_NAME_SYSTEM";
     /**
-     * @Fields:  GITHUBAPI地址
+     * @Fields: GITHUBAPI地址
      */
     public static final String GITHUB_API_URL = "GITHUB_API_URL";
     /**
@@ -444,7 +447,7 @@ public class Global {
      */
     public static final String CEPH_CONF = "CEPH_CONF";
     /**
-     * @Fields:  GITHUB地址
+     * @Fields: GITHUB地址
      */
     public static final String GITHUB_CODE_URL = "GITHUB_CODE_URL";
     /**
@@ -496,7 +499,7 @@ public class Global {
      */
     public static final String DEVOPS_PLUGIN_GIT = "DEVOPS_PLUGIN_GIT";
     /**
-     * @Fields:  DEVOPSSVN插件版本
+     * @Fields: DEVOPSSVN插件版本
      */
     public static final String DEVOPS_PLUGIN_SVN = "DEVOPS_PLUGIN_SVN";
     /**
@@ -533,7 +536,7 @@ public class Global {
      */
     public static final String CEPH_MONITOR = "CEPH_MONITOR";
     /**
-     * @Fields:  DEVOPSDOCKER插件版本
+     * @Fields: DEVOPSDOCKER插件版本
      */
     public static final String DEVOPS_PLUGIN_DOCKER = "DEVOPS_PLUGIN_DOCKER";
     /**
@@ -566,4 +569,22 @@ public class Global {
      */
     public static final String DEFAULT_SYSTEM_IP = "127.0.0.1";
 
+    /**
+     * NodeJS plugin version not language version.
+     */
+    public static final String DEVOPS_PLUGIN_NODEJS = "DEVOPS_PLUGIN_NODEJS";
+
+    /**
+     * / XCLOUD结果校验间隔
+     * 不仅仅是SheRa
+     */
+    public static final String XCLOUD_CI_CHECK_RESULT_INTERVAL_TIME = "XCLOUD_CI_CHECK_RESULT_INTERVAL_TIME";
+
+    /**
+     * XCLOUD超时次数
+     */
+    public static final String XCLOUD_CI_CHECK_RESULT_TIMEOUT_COUNT = "XCLOUD_CI_CHECK_RESULT_TIMEOUT_COUNT";
+
+    public static final String QUERY_SONAR_RESULT_INTERVAL_TIME_AFTER_JENKINS_FINISH = "QUERY_SONAR_RESULT_INTERVAL_TIME_AFTER_JENKINS_FINISH";
 }
+
