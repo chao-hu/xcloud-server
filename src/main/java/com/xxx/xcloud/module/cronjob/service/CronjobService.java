@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.xxx.xcloud.module.cronjob.entity.Cronjob;
-import com.xxx.xcloud.rest.v1.cronjob.dto.JobInfoDTO;
+import com.xxx.xcloud.module.cronjob.model.JobInfoModel;
 
 /**
  * 
@@ -147,5 +147,5 @@ public interface CronjobService {
      *            定时任务id
      * @return List<JobInfoDTO>
      */
-    List<JobInfoDTO> getRelatedJobs(String cronjobId);
+    List<JobInfoModel> getRelatedJobs(String cronjobId);
 }

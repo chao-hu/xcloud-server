@@ -1,7 +1,5 @@
 package com.xxx.xcloud.rest.v1.cronjob;
 
-import java.util.Date;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,7 +23,6 @@ import com.xxx.xcloud.module.cronjob.entity.Cronjob;
 import com.xxx.xcloud.module.cronjob.service.CronjobService;
 import com.xxx.xcloud.rest.v1.cronjob.dto.CronOperatorDTO;
 import com.xxx.xcloud.rest.v1.cronjob.dto.CronjobDTO;
-import com.xxx.xcloud.utils.StringUtils;
 
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -55,48 +51,16 @@ public class CronController {
     @ResponseBody
     @RequestMapping(value = { "" }, method = RequestMethod.POST)
     @ApiOperation(value = "创建定时任务", notes = "")
-    public ApiResult createCron(@Valid @RequestBody CronjobDTO json, BindingResult result) {
+    public ApiResult createCron(@Valid @RequestBody CronjobDTO dto) {
 
-        String tenantName = json.getTenantName();
-        String name = json.getName();
-        String imageVersionId = json.getImageVersionId();
-        Double cpu = json.getCpu();
-        Double memory = json.getMemory();
-        String cmd = json.getCmd();
-        String scheduleCh = json.getScheduleCh();
-        String schedule = json.getSchedule();
-
-        // 包装定时任务
-        Cronjob cronjob = generateCron(tenantName, name, imageVersionId, cpu, memory, schedule, cmd, scheduleCh,
-                json.getCreatedBy(), json.getProjectId());
-
+        Cronjob cronjob = new Cronjob();
         try {
-            cronjobService.createCronjob(cronjob);
+            cronjob = cronjobService.createCronjob(dto.getCronJob());
         } catch (ErrorMessageException e) {
             return new ApiResult(e.getCode(), e.getMessage());
         }
 
         return new ApiResult(ReturnCode.CODE_SUCCESS, cronjob, "定时任务创建成功");
-    }
-
-    private Cronjob generateCron(String tenantName, String name, String imageVersionId, Double cpu, Double memory,
-            String schedule, String cmd, String scheduleCh, String createdBy, String projectId) {
-        Cronjob cronjob = new Cronjob();
-        cronjob.setCmd(cmd);
-        cronjob.setCpu(cpu);
-        cronjob.setCreateTime(new Date());
-        cronjob.setImageVerisonId(imageVersionId);
-        cronjob.setMemory(memory);
-        cronjob.setName(name);
-        cronjob.setSchedule(schedule);
-        cronjob.setScheduleCh(scheduleCh);
-        cronjob.setTenantName(tenantName);
-        cronjob.setCreateTime(new Date());
-        cronjob.setStatus(Global.OPERATION_UNSTART);
-        cronjob.setCreatedBy(createdBy);
-        cronjob.setProjectId(projectId);
-
-        return cronjob;
     }
 
 
@@ -107,98 +71,43 @@ public class CronController {
     @RequestMapping(value = { "/{cronId}" }, method = RequestMethod.PUT)
     @ApiOperation(value = " 启动、停止、修改定时任务", notes = "")
     @ApiImplicitParam(paramType = "path", name = "cronId", value = "任务ID", required = true, dataType = "String")
-    public ApiResult operatorCron(@PathVariable("cronId") String cronId, @RequestBody CronOperatorDTO json, BindingResult result) {
+    public ApiResult operatorCron(@PathVariable("cronId") String cronId, @RequestBody CronOperatorDTO dto) {
 
-        ApiResult apiResult = new ApiResult();
-        Double cpu = json.getCpu();
-        Double memory = json.getMemory();
-        String cmd = json.getCmd();
-        String schedule = json.getSchedule();
-        String operator = json.getOperation();
-
-        Cronjob cronJob = null;
-        // 校验
-        apiResult = checkUpdateParam(cpu, memory, schedule, operator);
-        if (null != apiResult) {
-            return apiResult;
-        }
+        String operator = dto.getOperation();
+        Cronjob cronJob = cronjobService.getCronjobById(cronId);;
+        
         boolean flag = false;
         try {
-            // 执行操作
-            switch (json.getOperation()) {
+            switch (operator) {
             case "stop":
                 flag = cronjobService.stopCronjob(cronId);
                 break;
+                
             case "start":
                 flag = cronjobService.startCronjob(cronId);
                 break;
 
             case "modify":
-                Cronjob cronjob = generateUpdateCron(cronId, cpu, memory, schedule, cmd);
-                if (null == cronjob) {
-                    return new ApiResult(ReturnCode.CODE_SQL_FIND_ONE_FAILED, "根据cronjobId: " + cronId + " 查询信息失败");
-                }
-                cronJob = cronjobService.updateCronjob(cronjob);
+                cronJob = cronjobService.updateCronjob(cronJob);
                 break;
 
             default:
-                return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NULL, json.getOperation() + " 操作不存在");
+                return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NULL, operator + " 操作不存在");
             }
         } catch (ErrorMessageException e) {
             return new ApiResult(e.getCode(), e.getMessage());
         }
+        
+        // 启动或停止操作
         if (!Global.CRON_MODIFY.equals(operator) && !flag) {
             return new ApiResult(ReturnCode.CODE_CHECK_PARAM_NOT_UPDATE, " 操作失败");
         }
-
+        // 更新操作
         if (Global.CRON_MODIFY.equals(operator) && null == cronJob) {
             return new ApiResult(ReturnCode.CODE_CHECK_PARAM_NOT_UPDATE, " 操作失败");
         }
 
         return new ApiResult(ReturnCode.CODE_SUCCESS, "操作定时任务成功");
-    }
-
-    private Cronjob generateUpdateCron(String cronId, Double cpu, Double memory, String schedule, String cmd) {
-
-        Cronjob cronjob = null;
-
-        try {
-            cronjob = cronjobService.getCronjobById(cronId);
-        } catch (Exception e) {
-            return null;
-        }
-        if (null != cronjob) {
-            cronjob.setCmd(cmd);
-            cronjob.setCpu(cpu);
-            cronjob.setMemory(memory);
-            cronjob.setSchedule(schedule);
-            cronjob.setUpdateTime(new Date());
-        }
-
-        return cronjob;
-    }
-
-    private ApiResult checkUpdateParam(Double cpu, Double memory, String scheduleCh, String operator) {
-        if (!Global.getCronTypeCodes().contains(operator)) {
-            return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NOT_FORMAT, operator + " 操作不存在");
-        }
-
-        if (Global.CRON_MODIFY.equals(operator)) {
-
-            if (StringUtils.isEmpty(scheduleCh)) {
-                return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NULL, "任务时间不能为空");
-            }
-
-            if (Double.doubleToLongBits(memory) < 0) {
-                return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NOT_FORMAT, "内存应该大于0");
-            }
-
-            if (Double.doubleToLongBits(cpu) < 0) {
-                return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NOT_FORMAT, "CPU应该大于0");
-            }
-        }
-
-        return null;
     }
 
     /**

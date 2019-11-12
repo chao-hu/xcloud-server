@@ -9,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSON;
 import com.xxx.xcloud.common.ApiResult;
 import com.xxx.xcloud.common.ReturnCode;
 import com.xxx.xcloud.common.exception.ErrorMessageException;
@@ -54,17 +52,11 @@ public class EnvController {
     @ResponseBody
     @RequestMapping(value = { "" }, method = RequestMethod.POST)
     @ApiOperation(value = "创建环境变量模版", notes = "")
-    public ApiResult createEnv(@Valid @RequestBody EnvDTO json, BindingResult result) {
+    public ApiResult createEnv(@Valid @RequestBody EnvDTO dto) {
 
         EnvTemplate envTemplate = new EnvTemplate();
-        envTemplate.setCreatedBy(json.getCreatedBy());
-        envTemplate.setEnvData(JSON.toJSONString(json.getEnvData()));
-        envTemplate.setProjectId(json.getProjectId());
-        envTemplate.setTemplateName(json.getTemplateName());
-        envTemplate.setTenantName(json.getTenantName());
-
         try {
-            envTemplate = envService.add(envTemplate);
+            envTemplate = envService.add(dto.getEnvTemplate());
         } catch (ErrorMessageException e) {
             return new ApiResult(e.getCode(), e.getMessage());
         }
@@ -97,7 +89,7 @@ public class EnvController {
     @RequestMapping(value = { "/{envId}" }, method = RequestMethod.PUT)
     @ApiOperation(value = "修改环境变量模版", notes = "")
     @ApiImplicitParam(paramType = "path", name = "envId", value = "环境变量模版ID", required = true, dataType = "String")
-    public ApiResult updateEnv(@PathVariable("envId") String envId, @Valid @RequestBody EnvUpdateDTO json, BindingResult result) {
+    public ApiResult updateEnv(@PathVariable("envId") String envId, @Valid @RequestBody EnvUpdateDTO json) {
 
         try {
             envService.update(envId, json.getEnvData());

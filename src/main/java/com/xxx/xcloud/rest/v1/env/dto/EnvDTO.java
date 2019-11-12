@@ -9,7 +9,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 
+import com.alibaba.fastjson.JSON;
 import com.xxx.xcloud.common.Global;
+import com.xxx.xcloud.module.env.entity.EnvTemplate;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -47,4 +49,22 @@ public class EnvDTO {
     @ApiModelProperty(value = "创建人", required = false, example = "testuser", dataType = "String")
     private String createdBy;
 
+    
+    /**
+     * 构造EnvTemplate对象
+     * @Title: getEnvTemplate
+     * @Description: 构造EnvTemplate对象
+     * @return EnvTemplate 
+     * @throws
+     */
+    public EnvTemplate getEnvTemplate(){
+        EnvTemplate envTemplate = new EnvTemplate();
+        envTemplate.setCreatedBy(getCreatedBy());
+        envTemplate.setEnvData(JSON.toJSONString(getEnvData()));
+        envTemplate.setProjectId(getProjectId());
+        envTemplate.setTemplateName(getTemplateName());
+        envTemplate.setTenantName(getTenantName());
+        
+        return envTemplate;
+    }
 }

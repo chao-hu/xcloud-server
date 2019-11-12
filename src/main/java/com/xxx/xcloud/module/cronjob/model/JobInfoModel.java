@@ -1,4 +1,4 @@
-package com.xxx.xcloud.rest.v1.cronjob.dto;
+package com.xxx.xcloud.module.cronjob.model;
 
 import java.util.Date;
 
@@ -14,7 +14,7 @@ import lombok.Data;
  * @date 2019年10月29日
  */
 @Data
-public class JobInfoDTO {
+public class JobInfoModel {
 
     /**
      * 任务名称

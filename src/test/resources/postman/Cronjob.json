@@ -1,0 +1,227 @@
+{
+	"info": {
+		"_postman_id": "39f6484a-ac78-46e9-8b8b-6afc21e47e21",
+		"name": "Cronjob",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "创建定时任务",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"cpu\": 1,\r\n  \"createdBy\": \"ceshizuhu\",\r\n  \"imageVersionId\": \"4028818f6c0662b8016c066e9e7c000a\",\r\n  \"memory\": 1,\r\n  \"name\": \"testcron\",\r\n  \"projectId\": \"projectid\",\r\n  \"schedule\": \"*/1 * * * *\",\r\n  \"scheduleCh\": \"每分钟\",\r\n  \"tenantName\": \"ceshizuhu\"\r\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/server/v1/cron",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"server",
+						"v1",
+						"cron"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "定时任务列表查询",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://127.0.0.1:8080/server/v1/cron?tenantName=ceshizuhu",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"server",
+						"v1",
+						"cron"
+					],
+					"query": [
+						{
+							"key": "tenantName",
+							"value": "ceshizuhu"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "定时任务详情查询",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://127.0.0.1:8080/server/v1/cron/297e37e26e5996c5016e59976b250000",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"server",
+						"v1",
+						"cron",
+						"297e37e26e5996c5016e59976b250000"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "启动定时任务",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"operation\": \"start\"\r\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/server/v1/cron/297e37e26e5996c5016e59976b250000",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"server",
+						"v1",
+						"cron",
+						"297e37e26e5996c5016e59976b250000"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "修改定时任务",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"cpu\": 2,\r\n  \"memory\": 1,\r\n  \"operation\": \"modify\",\r\n  \"schedule\": \"*/1 * * * *\"\r\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/server/v1/cron/297e37e26e5996c5016e59976b250000",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"server",
+						"v1",
+						"cron",
+						"297e37e26e5996c5016e59976b250000"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "停止定时任务",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"operation\": \"stop\"\r\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/server/v1/cron/297e37e26e5996c5016e59976b250000",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"server",
+						"v1",
+						"cron",
+						"297e37e26e5996c5016e59976b250000"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "删除定时任务",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://127.0.0.1:8080/server/v1/cron/297e37e26e5996c5016e59976b250000",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"server",
+						"v1",
+						"cron",
+						"297e37e26e5996c5016e59976b250000"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

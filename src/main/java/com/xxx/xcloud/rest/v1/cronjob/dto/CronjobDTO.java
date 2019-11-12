@@ -3,11 +3,14 @@
  */
 package com.xxx.xcloud.rest.v1.cronjob.dto;
 
+import java.util.Date;
+
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 import com.xxx.xcloud.common.Global;
+import com.xxx.xcloud.module.cronjob.entity.Cronjob;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -64,4 +67,30 @@ public class CronjobDTO {
     @ApiModelProperty(value = "创建人", required = false, example = "testtenant", dataType = "String")
     private String createdBy;
 
+    
+    /**
+     * 构造Cronjob对象
+     * @Title: getCronJob
+     * @Description: 构造Cronjob对象
+     * @return Cronjob 
+     * @throws
+     */
+    public Cronjob getCronJob(){
+        Cronjob cronjob = new Cronjob();
+        cronjob.setCmd(getCmd());
+        cronjob.setCpu(getCpu());
+        cronjob.setCreateTime(new Date());
+        cronjob.setImageVerisonId(getImageVersionId());
+        cronjob.setMemory(getMemory());
+        cronjob.setName(getName());
+        cronjob.setSchedule(getSchedule());
+        cronjob.setScheduleCh(getScheduleCh());
+        cronjob.setTenantName(getTenantName());
+        cronjob.setCreateTime(new Date());
+        cronjob.setStatus(Global.OPERATION_UNSTART);
+        cronjob.setCreatedBy(getCreatedBy());
+        cronjob.setProjectId(getProjectId());
+        
+        return cronjob;
+    }
 }

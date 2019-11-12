@@ -21,11 +21,11 @@ import com.xxx.xcloud.common.ReturnCode;
 import com.xxx.xcloud.common.XcloudProperties;
 import com.xxx.xcloud.common.exception.ErrorMessageException;
 import com.xxx.xcloud.module.cronjob.entity.Cronjob;
+import com.xxx.xcloud.module.cronjob.model.JobInfoModel;
 import com.xxx.xcloud.module.cronjob.repository.CronjobRepository;
 import com.xxx.xcloud.module.cronjob.service.CronjobService;
 import com.xxx.xcloud.module.tenant.entity.Tenant;
 import com.xxx.xcloud.module.tenant.service.ITenantService;
-import com.xxx.xcloud.rest.v1.cronjob.dto.JobInfoDTO;
 import com.xxx.xcloud.utils.DateUtil;
 import com.xxx.xcloud.utils.StringUtils;
 
@@ -97,8 +97,6 @@ public class CronjobServiceImpl implements CronjobService {
 
         // 3.保存相关信息到数据库
         try {
-            cronjob.setStatus(Global.OPERATION_UNSTART);
-            cronjob.setCreateTime(new Date());
             cronjob = cronjobRepository.save(cronjob);
         } catch (Exception e) {
             LOG.error("定时任务保存失败 ", e);
@@ -456,8 +454,8 @@ public class CronjobServiceImpl implements CronjobService {
     }
 
     @Override
-    public List<JobInfoDTO> getRelatedJobs(String cronjobId) {
-        List<JobInfoDTO> jobInfos = new ArrayList<JobInfoDTO>(10);
+    public List<JobInfoModel> getRelatedJobs(String cronjobId) {
+        List<JobInfoModel> jobInfos = new ArrayList<JobInfoModel>(10);
         // 1.校验任务存在与否及状态的正确性
         Cronjob cronjob = getCronjobById(cronjobId);
         byte status = cronjob.getStatus();
@@ -472,7 +470,7 @@ public class CronjobServiceImpl implements CronjobService {
             jobList = KubernetesClientFactory.getClient().batch().jobs().inNamespace(cronjob.getTenantName())
                     .withLabels(labelSelector).list();
             for (Job job : jobList.getItems()) {
-                JobInfoDTO jobInfo = new JobInfoDTO();
+                JobInfoModel jobInfo = new JobInfoModel();
                 jobInfo.setName(job.getMetadata().getName());
                 jobInfo.setStartTime(DateUtil.parseDate(DateUtil.parseStandardDate(job.getStatus().getStartTime())));
                 jobInfo.setEndTime(DateUtil.parseDate(DateUtil.parseStandardDate(job.getStatus().getCompletionTime())));

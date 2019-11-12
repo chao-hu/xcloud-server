@@ -9,7 +9,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 
+import com.alibaba.fastjson.JSON;
 import com.xxx.xcloud.common.Global;
+import com.xxx.xcloud.module.configmap.entity.ConfigTemplate;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -47,5 +49,24 @@ public class ConfigDTO {
 
     @ApiModelProperty(value = "创建人", required = false, example = "testuser", dataType = "String")
     private String createdBy;
+    
+
+    /**
+     * 构造ConfigTemplate对象
+     * @Title: getConfigTemplate
+     * @Description: 构造ConfigTemplate对象
+     * @return ConfigTemplate 
+     * @throws
+     */
+    public ConfigTemplate getConfigTemplate(){
+        ConfigTemplate configTemplate = new ConfigTemplate();
+        configTemplate.setConfigData(JSON.toJSONString(getConfigData()));
+        configTemplate.setCreatedBy(getCreatedBy());
+        configTemplate.setProjectId(getProjectId());
+        configTemplate.setTemplateName(getTemplateName());
+        configTemplate.setTenantName(getTenantName());
+
+        return configTemplate;
+    }
 
 }

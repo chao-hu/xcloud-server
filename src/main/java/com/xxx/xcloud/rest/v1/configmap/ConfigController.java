@@ -12,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSON;
 import com.xxx.xcloud.common.ApiResult;
 import com.xxx.xcloud.common.ReturnCode;
 import com.xxx.xcloud.common.exception.ErrorMessageException;
@@ -61,18 +59,11 @@ public class ConfigController {
     @ResponseBody
     @RequestMapping(value = { "" }, method = RequestMethod.POST)
     @ApiOperation(value = "创建服务配置模版", notes = "")
-    public ApiResult createConfig(@Valid @RequestBody ConfigDTO json, BindingResult result) {
-
-        ConfigTemplate configTemplate = new ConfigTemplate();
-        configTemplate.setConfigData(JSON.toJSONString(json.getConfigData()));
-        configTemplate.setCreatedBy(json.getCreatedBy());
-        configTemplate.setProjectId(json.getProjectId());
-        configTemplate.setTemplateName(json.getTemplateName());
-        configTemplate.setTenantName(json.getTenantName());
+    public ApiResult createConfig(@Valid @RequestBody ConfigDTO dto) {
 
         ConfigTemplate config = null;
         try {
-            config = configService.add(configTemplate);
+            config = configService.add(dto.getConfigTemplate());
         } catch (ErrorMessageException e) {
             return new ApiResult(e.getCode(), e.getMessage());
         }
@@ -106,7 +97,7 @@ public class ConfigController {
     @RequestMapping(value = { "/{configId}" }, method = RequestMethod.PUT)
     @ApiOperation(value = "修改服务配置模版", notes = "")
     @ApiImplicitParam(paramType = "path", name = "configId", value = "服务ID", required = true, dataType = "String")
-    public ApiResult updateConfig(@PathVariable("configId") String configId, @Valid @RequestBody ConfigUpdateDTO json, BindingResult result) {
+    public ApiResult updateConfig(@PathVariable("configId") String configId, @Valid @RequestBody ConfigUpdateDTO json) {
 
         try {
             configService.update(configId, json.getConfigData());
@@ -214,7 +205,7 @@ public class ConfigController {
     @ResponseBody
     @RequestMapping(value = { "/mount" }, method = RequestMethod.POST)
     @ApiOperation(value = "保存服务配置挂载模版", notes = "")
-    public ApiResult saveConfigMount(@Valid @RequestBody ConfigMountDTO json, BindingResult result) {
+    public ApiResult saveConfigMount(@Valid @RequestBody ConfigMountDTO json) {
 
         String serviceId = json.getServiceId();
 
