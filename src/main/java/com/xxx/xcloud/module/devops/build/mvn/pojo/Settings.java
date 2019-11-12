@@ -1,0 +1,38 @@
+package com.xxx.xcloud.module.devops.build.mvn.pojo;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+
+/**
+ * @author xingej
+ * maven模块 bean
+ * maven Settings file
+ */
+public class Settings {
+	/**
+	 * 文件对应类
+	 */
+	private String clazz;
+	/**
+	 * 文件路径
+	 */
+	private String path;
+
+	@XmlAttribute(name = "class")
+	public String getClazz() {
+		return clazz;
+	}
+
+	public void setClazz(String clazz) {
+		this.clazz = clazz;
+	}
+
+	@XmlElement(name = "path")
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+}
