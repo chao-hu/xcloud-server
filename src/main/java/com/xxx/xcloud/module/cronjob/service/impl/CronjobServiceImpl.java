@@ -24,6 +24,7 @@ import com.xxx.xcloud.module.cronjob.entity.Cronjob;
 import com.xxx.xcloud.module.cronjob.model.JobInfoModel;
 import com.xxx.xcloud.module.cronjob.repository.CronjobRepository;
 import com.xxx.xcloud.module.cronjob.service.CronjobService;
+import com.xxx.xcloud.module.image.service.ImageService;
 import com.xxx.xcloud.module.tenant.entity.Tenant;
 import com.xxx.xcloud.module.tenant.service.ITenantService;
 import com.xxx.xcloud.utils.DateUtil;
@@ -62,6 +63,9 @@ public class CronjobServiceImpl implements CronjobService {
      */
     @Autowired
     private CronjobRepository cronjobRepository;
+    
+    @Autowired
+    private ImageService imageService;
 
     /**
      * 租户操作接口
@@ -379,9 +383,7 @@ public class CronjobServiceImpl implements CronjobService {
         String imageName = "";
         // 拼接镜像地址
         try {
-            //imageName = imageService.getRegistryImageName(cronjob.getImageVerisonId());
-            imageName = "https://172.16.3.217:8443/library/bdocs:v0.1.0";
-            // TODO
+            imageName = imageService.getRegistryImageName(cronjob.getImageVerisonId());
         } catch (Exception e) {
             LOG.error("获取当前镜像信息失败", e);
             return null;

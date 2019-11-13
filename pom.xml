@@ -189,7 +189,7 @@
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
-            <version>2.2.1</version>
+            <version>2.2.1</version><!--$NO-MVN-MAN-VER$-->
             <exclusions>
                 <exclusion>
                     <artifactId>slf4j-api</artifactId>
@@ -214,6 +214,12 @@
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
             <version>1.8.2</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>0.1.46</version>
         </dependency>
 
     </dependencies>

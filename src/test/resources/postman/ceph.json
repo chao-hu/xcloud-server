@@ -1,0 +1,960 @@
+{
+	"info": {
+		"_postman_id": "7b2d5dbe-c628-44a6-8c31-6e49321d433f",
+		"name": "ceph",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "新建文件存储卷",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"createdBy\": \"ceshizuhu\",\r\n  \"description\": \"just a test\",\r\n  \"projectId\": \"projectid\",\r\n  \"storageFileName\": \"filettestone\",\r\n  \"storageFileSize\": 10,\r\n  \"tenantName\": \"ceshizuhu\"\r\n}"
+				},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/file",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"file"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "获取文件存储列表",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/file?tenantName=ceshizuhu",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"file"
+					],
+					"query": [
+						{
+							"key": "tenantName",
+							"value": "ceshizuhu"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "获取文件存储卷详情",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/file/402883136e63fed4016e6401b49b0000",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"file",
+						"402883136e63fed4016e6401b49b0000"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "文件存储卷内增加文件夹",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"directoryName\": \"testdir\",\r\n  \"directoryPath\": \"/\"\r\n}"
+				},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/file/402883136e63fed4016e6401b49b0000/directory",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"file",
+						"402883136e63fed4016e6401b49b0000",
+						"directory"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "文件存储卷内上传、下载文件",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"disabled": true
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/file/402883136e63fed4016e6401b49b0000/file?operation=download&fileName=%2Ftestdir%2Fapplication.properties",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"file",
+						"402883136e63fed4016e6401b49b0000",
+						"file"
+					],
+					"query": [
+						{
+							"key": "operation",
+							"value": "download"
+						},
+						{
+							"key": "fileName",
+							"value": "%2Ftestdir%2Fapplication.properties"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "获取存储卷指定目录下文件信息列表",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/file/402883136e63fed4016e640f7a360001/files?path=%2F",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"file",
+						"402883136e63fed4016e640f7a360001",
+						"files"
+					],
+					"query": [
+						{
+							"key": "path",
+							"value": "%2F"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "文件存储卷内删除文件或文件夹",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/file/402883136e63fed4016e6401b49b0000/file?fileName=/testdir/application.properties",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"file",
+						"402883136e63fed4016e6401b49b0000",
+						"file"
+					],
+					"query": [
+						{
+							"key": "fileName",
+							"value": "/testdir/application.properties"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "格式化存储卷",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"operation\": \"format\"\r\n}"
+				},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/file/402883136e63fed4016e6401b49b0000",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"file",
+						"402883136e63fed4016e6401b49b0000"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "删除存储卷",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/file/402883136e63fed4016e6401b49b0000",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"file",
+						"402883136e63fed4016e6401b49b0000"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "新建块存储",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"createdBy\": \"ceshizuhu\",\r\n  \"description\": \"just a test\",\r\n  \"projectId\": \"projectid\",\r\n  \"rbdName\": \"rdbtestone\",\r\n  \"size\": 10,\r\n  \"tenantName\": \"ceshizuhu\"\r\n}"
+				},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/rbd",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"rbd"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "块存储列表",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/rbd?tenantName=ceshizuhu",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"rbd"
+					],
+					"query": [
+						{
+							"key": "tenantName",
+							"value": "ceshizuhu"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "块存储详情",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/rbd/402883136e63fed4016e6412329b0002",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"rbd",
+						"402883136e63fed4016e6412329b0002"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "块存储扩容",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"operation\": \"expand\",\r\n  \"size\": 12\r\n}"
+				},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/rbd/402883136e63fed4016e6412329b0002",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"rbd",
+						"402883136e63fed4016e6412329b0002"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "块存储手动拍快照",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"snapDescription\": \"snapDescription\",\r\n  \"snapName\": \"snapName\"\r\n}"
+				},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/rbd/402883136e63fed4016e6412329b0002/snapshot",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"rbd",
+						"402883136e63fed4016e6412329b0002",
+						"snapshot"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "查看快照列表",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/rbd/402883136e63fed4016e6412329b0002/snapshot/list",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"rbd",
+						"402883136e63fed4016e6412329b0002",
+						"snapshot",
+						"list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "块存储快照回滚",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"operation\": \"rollback\",\r\n  \"snapshotId\": \"402883136e63fed4016e6414afcb0003\"\r\n}"
+				},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/rbdrollback/402883136e63fed4016e6412329b0002",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"rbdrollback",
+						"402883136e63fed4016e6412329b0002"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "块存储快照删除",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/rbd/402883136e63fed4016e6412329b0002/snapshot/402883136e63fed4016e6414afcb0003",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"rbd",
+						"402883136e63fed4016e6412329b0002",
+						"snapshot",
+						"402883136e63fed4016e6414afcb0003"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "新增快照策略",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"endDate\": \"2020-01-20 00:00:00\",\r\n  \"status\": 0,\r\n  \"time\": \"0\",\r\n  \"week\": \"2\"\r\n}"
+				},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/rbd/402883136e63fed4016e6412329b0002/snapshot/plan",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"rbd",
+						"402883136e63fed4016e6412329b0002",
+						"snapshot",
+						"plan"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "查看快照策略",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/rbd/402883136e63fed4016e6412329b0002/snapshot/plan",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"rbd",
+						"402883136e63fed4016e6412329b0002",
+						"snapshot",
+						"plan"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "修改快照策略",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"endDate\": \"2020-01-20 00:00:00\",\r\n  \"status\": 0,\r\n  \"time\": \"0\",\r\n  \"week\": \"3\"\r\n}"
+				},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/rbd/402883136e63fed4016e6412329b0002/snapshot/plan",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"rbd",
+						"402883136e63fed4016e6412329b0002",
+						"snapshot",
+						"plan"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "删除快照策略",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/rbd/402883136e63fed4016e6412329b0002/snapshot/plan",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"rbd",
+						"402883136e63fed4016e6412329b0002",
+						"snapshot",
+						"plan"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "删除块存储",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/rbd/402883136e63fed4016e6412329b0002",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"rbd",
+						"402883136e63fed4016e6412329b0002"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "新建桶",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"accessControlList\": \"private\",\r\n  \"bucketName\": \"objtest1\",\r\n\t  \"projectId\": \"123456\",\r\n  \"tenantName\": \"ceshizuhu\"\r\n}"
+				},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/bucket",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"bucket"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "桶列表",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/bucket?tenantName=ceshizuhu",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"bucket"
+					],
+					"query": [
+						{
+							"key": "tenantName",
+							"value": "ceshizuhu"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "桶内上传文件、桶内下载文件",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/obj/objtest1/file?tenantName=ceshizuhu&projectId=123456&operation=upload&storageClass=STANDARD&acl=publicread",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"obj",
+						"objtest1",
+						"file"
+					],
+					"query": [
+						{
+							"key": "tenantName",
+							"value": "ceshizuhu"
+						},
+						{
+							"key": "projectId",
+							"value": "123456"
+						},
+						{
+							"key": "operation",
+							"value": "upload"
+						},
+						{
+							"key": "storageClass",
+							"value": "STANDARD"
+						},
+						{
+							"key": "acl",
+							"value": "publicread"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "查看桶内对象",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/obj/objtest1?tenantName=ceshizuhu&projectId=123456",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"obj",
+						"objtest1"
+					],
+					"query": [
+						{
+							"key": "tenantName",
+							"value": "ceshizuhu"
+						},
+						{
+							"key": "projectId",
+							"value": "123456"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "获取对象存储终端地址",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/bucketEndpoint",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"bucketEndpoint"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "删除桶内文件",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/obj/objtest1/file?tenantName=ceshizuhu&fileName=readme.docx&projectId=123456",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"obj",
+						"objtest1",
+						"file"
+					],
+					"query": [
+						{
+							"key": "tenantName",
+							"value": "ceshizuhu"
+						},
+						{
+							"key": "fileName",
+							"value": "readme.docx"
+						},
+						{
+							"key": "projectId",
+							"value": "123456"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "删除桶",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://testpro.copdev.cn:80/server/v1/storage/bucket/objtest1?tenantName=ceshizuhu&projectId=123456",
+					"protocol": "http",
+					"host": [
+						"testpro",
+						"copdev",
+						"cn"
+					],
+					"port": "80",
+					"path": [
+						"server",
+						"v1",
+						"storage",
+						"bucket",
+						"objtest1"
+					],
+					"query": [
+						{
+							"key": "tenantName",
+							"value": "ceshizuhu"
+						},
+						{
+							"key": "projectId",
+							"value": "123456"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
