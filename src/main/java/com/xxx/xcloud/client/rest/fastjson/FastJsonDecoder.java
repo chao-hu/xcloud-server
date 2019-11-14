@@ -1,18 +1,13 @@
 package com.xxx.xcloud.client.rest.fastjson;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
+import com.alibaba.fastjson.*;
+import feign.*;
+import feign.codec.*;
+import org.apache.commons.io.*;
+import org.apache.http.*;
 
-import org.apache.http.HttpStatus;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONException;
-
-import feign.FeignException;
-import feign.Response;
-import feign.Util;
-import feign.codec.DecodeException;
-import feign.codec.Decoder;
+import java.io.*;
+import java.lang.reflect.*;
 
 /**
  * @ClassName: FastJsonDecoder
@@ -44,18 +39,10 @@ public class FastJsonDecoder implements Decoder {
             return null;
         }
         try {
+            InputStream is = response.body().asInputStream();
+            String str = IOUtils.toString(is, "utf-8");
 
-            String text = response.body().toString();
-            if (JSON.isValidArray(text)) {
-
-                return JSON.parseArray(text);
-            }
-            if (JSON.isValidObject(text)) {
-
-                return JSON.parseObject(text);
-            }
-
-            return JSON.parse(text);
+            return JSON.parse(str);
         } catch (JSONException e) {
             if (e.getCause() != null && e.getCause() instanceof IOException) {
                 throw IOException.class.cast(e.getCause());
@@ -64,5 +51,6 @@ public class FastJsonDecoder implements Decoder {
             throw e;
         }
     }
+
 
 }
