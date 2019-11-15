@@ -634,4 +634,9 @@ public class ReturnCode {
      * // xcloud注册代码信息失败
      */
     public static final int CODE_XCLOUD_REGISTER_CREDENTIALS_FAILED = 1407;
+
+    /**
+     * // k8s查询ingress失败
+     */
+    public static final int CODE_K8S_GET_INGRESS_FAILED = 935;
 }

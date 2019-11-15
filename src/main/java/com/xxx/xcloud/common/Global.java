@@ -236,6 +236,8 @@ public class Global {
      */
     private static final List<String> CRON_TYPE_CODES = Arrays.asList(CRON_STOP, CRON_START, CRON_MODIFY);
 
+    public static final String INITCONTAINER_SERVICE_DEPENDENCY = "/library/service-dependency:v1.0";
+
     /**
      * @Title: getCronTypeCodes
      * @Description: 获取 cron操作类型列表
@@ -586,5 +588,21 @@ public class Global {
     public static final String XCLOUD_CI_CHECK_RESULT_TIMEOUT_COUNT = "XCLOUD_CI_CHECK_RESULT_TIMEOUT_COUNT";
 
     public static final String QUERY_SONAR_RESULT_INTERVAL_TIME_AFTER_JENKINS_FINISH = "QUERY_SONAR_RESULT_INTERVAL_TIME_AFTER_JENKINS_FINISH";
+
+    // 是否使用灰度发布
+    /**
+     * 不使用
+     */
+    public static final byte DOMAIN_NOT_USE_CANARY = 0;
+    /**
+     * 使用
+     */
+    public static final byte DOMAIN_USE_CANARY = 1;
+
+    /**
+     * 挂载存储卷的服务类型
+     */
+    public static final String MOUNTCEPHFILE_SERVICE = "service";
+    public static final String MOUNTCEPHFILE_CONFIGBUS = "springcloud-configbus";
 }
 
