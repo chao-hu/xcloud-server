@@ -29,7 +29,8 @@ import com.amazonaws.services.s3.model.StorageClass;
 import com.xxx.xcloud.client.ceph.CephClientFactory;
 import com.xxx.xcloud.common.ReturnCode;
 import com.xxx.xcloud.common.exception.ErrorMessageException;
-import com.xxx.xcloud.module.ceph.pojo.AccessControlListEnum;
+import com.xxx.xcloud.module.ceph.constant.CephConstant;
+import com.xxx.xcloud.module.ceph.model.AccessControlListEnum;
 import com.xxx.xcloud.module.ceph.service.AbstractCephObjectService;
 import com.xxx.xcloud.utils.StringUtils;
 
@@ -45,26 +46,6 @@ import com.xxx.xcloud.utils.StringUtils;
 @Service
 public class CephObjectServiceImpl extends AbstractCephObjectService {
 
-    private static final String BUCKET_NAME_ILLEGAL = "桶名称不合法，应由5到15位小写字母、数字和下划线组成，以字母开头";
-    private static final String BUCKET_NOT_EXIST = "桶:%s不存在或不属于租户:%s";
-    private static final String BUCKET_ACL_ILLEGAL = "acl参数不合法，应为private/publicread/publicreadwrite";
-    private static final String BUCKET_STORAGECLASS_ILLEGAL = "storageClass参数不合法，应为STANDARD/GLACIER/STANDARD_IA";
-    private static final String BUCKET_ALREADY_EXIST = "桶:%s已经存在";
-    private static final String BUCKET_CREATE_FAILED = "桶:%s创建失败";
-    private static final String BUCKET_NOT_EMPTY = "桶:%s非空，删除失败";
-    private static final String BUCKET_DELETE_FAILED = "桶不存在或删除失败";
-    private static final String UPLOAD_FAILED = "上传文件失败";
-    private static final String UPLOAD_FILE_EMPTY = "上传文件为空";
-    private static final String UPLOAD_FILE_ALREADY_EXIST = "文件已存在";
-    private static final String DOWNLOAD_FAILED = "文件:%s下载失败";
-    private static final String TENANT_NAME_ILLEGAL = "租户名为空";
-    private static final String FILE_NAME_EMPTY = "文件名为空";
-    private static final String DOWNLOAD_FILE_NOT_EXIST = "对象:%s不存在";
-    private static final String DOWNLOAD_FILE_NAME_ILLEGAL = "下载文件名为空";
-    private static final String CEPH_OBJ_CLIENT = "对象存储客户端异常";
-    private static final String CHARSET_UTF = "utf-8";
-    private static final String CHARSET_ISO = "ISO8859-1";
-
     @Override
     protected AWSCredentials getCredentials(String tenantName) {
         return new BasicAWSCredentials(tenantName, tenantName);
@@ -75,13 +56,13 @@ public class CephObjectServiceImpl extends AbstractCephObjectService {
 
         // check bucketName
         if (StringUtils.isEmpty(bucketName) || !bucketName.toLowerCase().equals(bucketName)) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, BUCKET_NAME_ILLEGAL);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.BUCKET_NAME_ILLEGAL);
         }
 
         // check acl
         AccessControlListEnum acl = AccessControlListEnum.getAcl(accessControlList);
         if (acl == null) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, BUCKET_ACL_ILLEGAL);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.BUCKET_ACL_ILLEGAL);
         }
 
         // check if conn is connected and the bucket exists
@@ -89,12 +70,12 @@ public class CephObjectServiceImpl extends AbstractCephObjectService {
         try {
             bucketExist = CephClientFactory.getCephObjectConn().doesBucketExistV2(bucketName);
         } catch (Exception e) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_CLIENT, CEPH_OBJ_CLIENT);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_CLIENT, CephConstant.CEPH_OBJ_CLIENT);
         }
 
         if (bucketExist) {
             throw new ErrorMessageException(ReturnCode.CODE_CEPH_EXIST,
-                    String.format(BUCKET_ALREADY_EXIST, bucketName));
+                    String.format(CephConstant.BUCKET_ALREADY_EXIST, bucketName));
         }
 
         AWSCredentials awsCredentials = getCredentials(tenantName);
@@ -113,7 +94,7 @@ public class CephObjectServiceImpl extends AbstractCephObjectService {
             CephClientFactory.getCephObjectConn().createBucket(createBucketRequest);
         } catch (Exception e) {
             throw new ErrorMessageException(ReturnCode.CODE_CEPH_CREATE,
-                    String.format(BUCKET_CREATE_FAILED, bucketName));
+                    String.format(CephConstant.BUCKET_CREATE_FAILED, bucketName));
         }
 
         return true;
@@ -142,12 +123,12 @@ public class CephObjectServiceImpl extends AbstractCephObjectService {
             List<S3ObjectSummary> s3ObjectSummaries = objectListing.getObjectSummaries();
             if (s3ObjectSummaries.size() > 0) {
                 throw new ErrorMessageException(ReturnCode.CODE_CEPH_OCCUPIED,
-                        String.format(BUCKET_NOT_EMPTY, bucketName));
+                        String.format(CephConstant.BUCKET_NOT_EMPTY, bucketName));
             }
 
             CephClientFactory.getCephObjectConn().deleteBucket(deleteBucketRequest);
         } catch (SdkClientException e) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_CLIENT, BUCKET_DELETE_FAILED);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_CLIENT, CephConstant.BUCKET_DELETE_FAILED);
         }
 
         return true;
@@ -171,7 +152,7 @@ public class CephObjectServiceImpl extends AbstractCephObjectService {
         try {
             buckets = CephClientFactory.getCephObjectConn().listBuckets(listBucketsRequest);
         } catch (Exception e) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_CLIENT, CEPH_OBJ_CLIENT);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_CLIENT, CephConstant.CEPH_OBJ_CLIENT);
         }
 
         for (Bucket bucket : buckets) {
@@ -201,7 +182,7 @@ public class CephObjectServiceImpl extends AbstractCephObjectService {
         try {
             buckets = CephClientFactory.getCephObjectConn().listBuckets(listBucketsRequest);
         } catch (Exception e) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_CLIENT, CEPH_OBJ_CLIENT);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_CLIENT, CephConstant.CEPH_OBJ_CLIENT);
         }
 
         return buckets;
@@ -226,12 +207,12 @@ public class CephObjectServiceImpl extends AbstractCephObjectService {
         try {
             if (getBucket(tenantName, bucketName) == null) {
                 throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND,
-                        String.format(BUCKET_NOT_EXIST, bucketName, tenantName));
+                        String.format(CephConstant.BUCKET_NOT_EXIST, bucketName, tenantName));
             }
             objectSummaries = CephClientFactory.getCephObjectConn().listObjects(listObjectsRequest)
                     .getObjectSummaries();
         } catch (SdkClientException e) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_CLIENT, CEPH_OBJ_CLIENT);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_CLIENT, CephConstant.CEPH_OBJ_CLIENT);
         }
 
         return objectSummaries;
@@ -253,23 +234,23 @@ public class CephObjectServiceImpl extends AbstractCephObjectService {
         deleteObjectRequest.setRequestCredentialsProvider(awsCredentialsProvider);
 
         if (StringUtils.isEmpty(bucketName)) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, BUCKET_NAME_ILLEGAL);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.BUCKET_NAME_ILLEGAL);
         }
 
         if (StringUtils.isEmpty(objName)) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, FILE_NAME_EMPTY);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.FILE_NAME_EMPTY);
         }
 
         // check if the bucket exists and belongs to the tenant
         if (getBucket(tenantName, bucketName) == null) {
             throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND,
-                    String.format(BUCKET_NOT_EXIST, bucketName, tenantName));
+                    String.format(CephConstant.BUCKET_NOT_EXIST, bucketName, tenantName));
         }
 
         try {
             CephClientFactory.getCephObjectConn().deleteObject(deleteObjectRequest);
         } catch (Exception e) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CEPH_OBJ_CLIENT);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.CEPH_OBJ_CLIENT);
         }
 
         return true;
@@ -279,31 +260,31 @@ public class CephObjectServiceImpl extends AbstractCephObjectService {
     public boolean upLoad(MultipartFile file, String tenantName, String acl, String storageClass, String bucketName) {
         AccessControlListEnum accessControlListEnum = AccessControlListEnum.getAcl(acl);
         if (accessControlListEnum == null) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, BUCKET_ACL_ILLEGAL);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.BUCKET_ACL_ILLEGAL);
         }
 
         StorageClass sClass = null;
         try {
             sClass = StorageClass.fromValue(storageClass);
         } catch (Exception e) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, BUCKET_STORAGECLASS_ILLEGAL);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.BUCKET_STORAGECLASS_ILLEGAL);
         }
 
         if (file == null) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, UPLOAD_FILE_EMPTY);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.UPLOAD_FILE_EMPTY);
         }
 
         if (StringUtils.isEmpty(tenantName)) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, TENANT_NAME_ILLEGAL);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.TENANT_NAME_ILLEGAL);
         }
 
         if (StringUtils.isEmpty(bucketName)) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, BUCKET_NAME_ILLEGAL);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.BUCKET_NAME_ILLEGAL);
         }
 
         if (getBucket(tenantName, bucketName) == null) {
             throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND,
-                    String.format(BUCKET_NOT_EXIST, bucketName, tenantName));
+                    String.format(CephConstant.BUCKET_NOT_EXIST, bucketName, tenantName));
         }
 
         ListObjectsRequest listObjectsRequest = new ListObjectsRequest();
@@ -329,7 +310,7 @@ public class CephObjectServiceImpl extends AbstractCephObjectService {
             List<S3ObjectSummary> s3ObjectSummaries = objectListing.getObjectSummaries();
             for (S3ObjectSummary s3 : s3ObjectSummaries) {
                 if (s3.getKey().equals(fileName)) {
-                    throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, UPLOAD_FILE_ALREADY_EXIST);
+                    throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.UPLOAD_FILE_ALREADY_EXIST);
                 }
             }
 
@@ -349,8 +330,8 @@ public class CephObjectServiceImpl extends AbstractCephObjectService {
             putObjectRequest.withCannedAcl(accessControlListEnum.acl);
             CephClientFactory.getCephObjectConn().putObject(putObjectRequest);
         } catch (SdkClientException | IOException e) {
-            log.error(UPLOAD_FAILED, e);
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_UPLOAD, UPLOAD_FAILED);
+            log.error(CephConstant.UPLOAD_FAILED, e);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_UPLOAD, CephConstant.UPLOAD_FAILED);
         }
 
         return true;
@@ -360,7 +341,7 @@ public class CephObjectServiceImpl extends AbstractCephObjectService {
     public void downLoad(String tenantName, String bucketName, String objName, HttpServletResponse response) {
         // check objName
         if (StringUtils.isEmpty(objName)) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, DOWNLOAD_FILE_NAME_ILLEGAL);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.DOWNLOAD_FILE_NAME_ILLEGAL);
         }
 
         S3Object s3Object = null;
@@ -368,7 +349,7 @@ public class CephObjectServiceImpl extends AbstractCephObjectService {
             // check if bk belongs to the tn
             if (getBucket(tenantName, bucketName) == null) {
                 throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND,
-                        String.format(BUCKET_NOT_EXIST, bucketName, tenantName));
+                        String.format(CephConstant.BUCKET_NOT_EXIST, bucketName, tenantName));
             }
 
             GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, objName);
@@ -385,13 +366,13 @@ public class CephObjectServiceImpl extends AbstractCephObjectService {
             getObjectRequest.setRequestCredentialsProvider(awsCredentialsProvider);
             s3Object = CephClientFactory.getCephObjectConn().getObject(getObjectRequest);
         } catch (SdkClientException e) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, DOWNLOAD_FAILED);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.DOWNLOAD_FAILED);
         }
 
         // check if the obj exists
         if (s3Object == null) {
             throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND,
-                    String.format(DOWNLOAD_FILE_NOT_EXIST, objName));
+                    String.format(CephConstant.DOWNLOAD_FILE_NOT_EXIST, objName));
         }
 
         response.reset();
@@ -399,7 +380,7 @@ public class CephObjectServiceImpl extends AbstractCephObjectService {
             response.setContentType("application/octet-stream");
             response.setCharacterEncoding("UTF-8");
             response.setHeader("Content-Disposition",
-                    "attachment; filename=\"" + new String(objName.getBytes(CHARSET_UTF), CHARSET_ISO) + "\"");
+                    "attachment; filename=\"" + new String(objName.getBytes(CephConstant.CHARSET_UTF), CephConstant.CHARSET_ISO) + "\"");
 
             byte[] b = new byte[1024];
             int len = -1;
@@ -408,7 +389,7 @@ public class CephObjectServiceImpl extends AbstractCephObjectService {
             }
             s3Object.getObjectContent().close();
         } catch (IOException e) {
-            String msg = String.format(DOWNLOAD_FAILED, objName);
+            String msg = String.format(CephConstant.DOWNLOAD_FAILED, objName);
             log.error(msg, e);
             throw new ErrorMessageException(ReturnCode.CODE_CEPH_DOWNLOAD, msg);
         }

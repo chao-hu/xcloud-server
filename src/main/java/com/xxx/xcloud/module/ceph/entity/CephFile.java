@@ -16,7 +16,7 @@ import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.GenericGenerator;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.xxx.xcloud.module.ceph.pojo.FileMountService;
+import com.xxx.xcloud.module.ceph.model.FileMountService;
 
 import lombok.Data;
 

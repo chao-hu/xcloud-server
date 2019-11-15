@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -33,9 +32,10 @@ import com.xxx.xcloud.common.Global;
 import com.xxx.xcloud.common.ReturnCode;
 import com.xxx.xcloud.common.XcloudProperties;
 import com.xxx.xcloud.common.exception.ErrorMessageException;
+import com.xxx.xcloud.module.ceph.constant.CephConstant;
 import com.xxx.xcloud.module.ceph.entity.CephFile;
 import com.xxx.xcloud.module.ceph.entity.ServiceAndCephFile;
-import com.xxx.xcloud.module.ceph.pojo.FileInfo;
+import com.xxx.xcloud.module.ceph.model.FileInfo;
 import com.xxx.xcloud.module.ceph.service.AbstractCephFileService;
 import com.xxx.xcloud.module.tenant.entity.Tenant;
 import com.xxx.xcloud.module.tenant.service.ITenantService;
@@ -55,29 +55,6 @@ import com.xxx.xcloud.utils.StringUtils;
 @Service
 public class CephFileServiceImpl extends AbstractCephFileService {
 
-    private static final String TENANT_NOT_EXIST = "指定的租户:%s不存在";
-    private static final String CEPH_FILE_ALREADY_EXIST = "文件存储卷:%s已经存在";
-    private static final String CEPH_FILE_NOT_EXIST = "文件存储卷不存在";
-    private static final String CEPH_FILE_NAME_ILLEGAL = "文件存储卷名称不合法，应由5到15位字母数字和下划线组成，以字母开头";
-    private static final String CEPH_FILE_SIZE_ILLEGAL = "文件存储卷大小:%s不合法";
-    private static final String CEPH_FILE_CREATE_FAILED = "租户:%s创建卷:%s异常";
-    private static final String CEPH_FILE_DELETE_FAILED = "文件存储卷:%s删除失败";
-    private static final String CEPH_FILE_MOUNTED = "文件存储卷:%s已被挂载，不能删除";
-    private static final String CEPH_FILE_UPLOAD_FAILED = "文件上传失败";
-    private static final String CEPH_FILE_DOWNLOAD_FAILED = "下载文件异常";
-    private static final String CEPH_FILE_DOWNLOAD_NOT_EXIST = "在存储卷内不存在";
-    private static final String CEPH_FILE_PATH_EMPTY = "文件路径为空";
-    private static final String CEPH_FILE_CLEAR_FAILED = "文件存储卷:%s清空失败";
-    private static final String CEPH_FILE_GET_RESOURCE_FAILED = "获取卷:%s已使用容量失败";
-    private static final String CEPH_FILE_FOLDER_ILLEGAL = "文件夹前缀不存在或不是文件夹";
-    private static final String CEPH_FILE_FOLDER_ALREADY_EXIST = "文件夹已经存在";
-    private static final String CEPH_FILE_EMPTY = "上传的文件为空";
-    private static final double HEX = 1024d;
-
-    public static final int NAME_MIN_LENGTH = 4;
-    public static final int NAME_MAX_LENGTH = 15;
-    public static final double CEPH_FILE_MIN_SIZE = 0d;
-
     private static final Logger LOG = LoggerFactory.getLogger(CephFileServiceImpl.class);
 
     @Autowired
@@ -86,49 +63,44 @@ public class CephFileServiceImpl extends AbstractCephFileService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public CephFile add(String tenantName, String createdBy, String projectId, String name, double size,
-            String description) {
+    public CephFile add(CephFile cephFile) {
         checkCephMount();
 
         // check if tenant exists
-        Tenant tenant = tenantService.findTenantByTenantName(tenantName);
+        Tenant tenant = tenantService.findTenantByTenantName(cephFile.getTenantName());
         if (null == tenant) {
             throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND,
-                    String.format(TENANT_NOT_EXIST, tenantName));
+                    String.format(CephConstant.TENANT_NOT_EXIST, cephFile.getTenantName()));
         }
 
         // check if the cephfile exists
-        if (cephFileRepository.findByNameAndTenantName(name, tenantName) != null) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_EXIST, String.format(CEPH_FILE_ALREADY_EXIST, name));
+        if (cephFileRepository.findByNameAndTenantName(cephFile.getName(), cephFile.getTenantName()) != null) {
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_EXIST, String.format(CephConstant.CEPH_FILE_ALREADY_EXIST, cephFile.getName()));
         }
 
         // check name
-        if (StringUtils.isEmpty(name) || !StringUtils.isAccountName(name, NAME_MIN_LENGTH, NAME_MAX_LENGTH)) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CEPH_FILE_NAME_ILLEGAL);
+        if (StringUtils.isEmpty(cephFile.getName()) || !StringUtils.isAccountName(cephFile.getName(), CephConstant.NAME_MIN_LENGTH, CephConstant.NAME_MAX_LENGTH)) {
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.CEPH_FILE_NAME_ILLEGAL);
         }
 
         // check size
-        if (size <= CEPH_FILE_MIN_SIZE) {
+        if (cephFile.getSize() <= CephConstant.CEPH_FILE_MIN_SIZE) {
             throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM,
-                    String.format(CEPH_FILE_SIZE_ILLEGAL, size));
+                    String.format(CephConstant.CEPH_FILE_SIZE_ILLEGAL, cephFile.getSize()));
         }
 
         // create folder
         try {
-            CephClientFactory.getCephFileClient().chdir(FILE_SPLIT + tenantName);
-            CephClientFactory.getCephFileClient().mkdir(name, MODE);
-            CephClientFactory.getCephFileClient().chmod(FILE_SPLIT + tenantName, MODE);
+            CephClientFactory.getCephFileClient().chdir(FILE_SPLIT + cephFile.getTenantName());
+            CephClientFactory.getCephFileClient().mkdir(cephFile.getName(), MODE);
+            CephClientFactory.getCephFileClient().chmod(FILE_SPLIT + cephFile.getTenantName(), MODE);
         } catch (Exception e) {
-            String msg = String.format(CEPH_FILE_CREATE_FAILED, tenantName, name);
+            String msg = String.format(CephConstant.CEPH_FILE_CREATE_FAILED, cephFile.getTenantName(), cephFile.getName());
             log.error(msg, e);
             throw new ErrorMessageException(ReturnCode.CODE_CEPH_CREATE, msg);
         }
 
-        CephFile cephFile = CephFile.builder().withCreateTime(new Date()).withDescription(description).withName(name)
-                .withTenantName(tenantName).withSize(size).withUpdateTime(new Date()).withCreateBy(createdBy)
-                .withProjectId(projectId).build();
-
-        cephFileRepository.save(cephFile);
+        cephFile = cephFileRepository.save(cephFile);
 
         return cephFile;
     }
@@ -138,19 +110,19 @@ public class CephFileServiceImpl extends AbstractCephFileService {
         checkCephMount();
 
         if (StringUtils.isEmpty(folderName)
-                || !StringUtils.isAccountName(folderName, NAME_MIN_LENGTH, NAME_MAX_LENGTH)) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CEPH_FILE_NAME_ILLEGAL);
+                || !StringUtils.isAccountName(folderName, CephConstant.NAME_MIN_LENGTH, CephConstant.NAME_MAX_LENGTH)) {
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.CEPH_FILE_NAME_ILLEGAL);
         }
 
         CephFile cephFile = cephFileRepository.findById(cephFileId).get();
         if (cephFile == null) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CEPH_FILE_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.CEPH_FILE_NOT_EXIST);
         }
 
         File file = new File(XcloudProperties.getConfigMap().get(Global.CEPH_SSH_MOUNTPOINT) + cephFile.getTenantName()
                 + FILE_SPLIT + cephFile.getName() + FILE_SPLIT + path);
         if (!file.exists() || !file.isDirectory()) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, path + CEPH_FILE_FOLDER_ILLEGAL);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, path + CephConstant.CEPH_FILE_FOLDER_ILLEGAL);
         }
 
         file = new File(XcloudProperties.getConfigMap().get(Global.CEPH_SSH_MOUNTPOINT) + cephFile.getTenantName()
@@ -158,7 +130,7 @@ public class CephFileServiceImpl extends AbstractCephFileService {
 
         // check if the folder exists
         if (file.exists()) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CEPH_FILE_FOLDER_ALREADY_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.CEPH_FILE_FOLDER_ALREADY_EXIST);
         }
 
         return file.mkdir();
@@ -171,12 +143,12 @@ public class CephFileServiceImpl extends AbstractCephFileService {
         // check cephFile
         CephFile cephFile = cephFileRepository.findById(cephFileId).get();
         if (cephFile == null) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CEPH_FILE_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.CEPH_FILE_NOT_EXIST);
         }
 
         // check file
         if (multipartFile == null) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CEPH_FILE_EMPTY);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.CEPH_FILE_EMPTY);
         }
 
         // check path
@@ -185,7 +157,7 @@ public class CephFileServiceImpl extends AbstractCephFileService {
         File file = new File(XcloudProperties.getConfigMap().get(Global.CEPH_SSH_MOUNTPOINT) + cephFile.getTenantName()
                 + FILE_SPLIT + cephFile.getName() + FILE_SPLIT + path);
         if (!file.exists() || !file.isDirectory()) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, path + CEPH_FILE_FOLDER_ILLEGAL);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, path + CephConstant.CEPH_FILE_FOLDER_ILLEGAL);
         }
 
         File[] existFiles = file.listFiles();
@@ -211,7 +183,7 @@ public class CephFileServiceImpl extends AbstractCephFileService {
             out.flush();
             out.close();
         } catch (IOException e) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_UPLOAD, CEPH_FILE_UPLOAD_FAILED);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_UPLOAD, CephConstant.CEPH_FILE_UPLOAD_FAILED);
         }
 
         return true;
@@ -224,12 +196,12 @@ public class CephFileServiceImpl extends AbstractCephFileService {
         // check cephFile
         CephFile cephFile = cephFileRepository.findById(cephFileId).get();
         if (cephFile == null) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CEPH_FILE_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.CEPH_FILE_NOT_EXIST);
         }
 
         // check path
         if (StringUtils.isEmpty(path)) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CEPH_FILE_PATH_EMPTY);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.CEPH_FILE_PATH_EMPTY);
         }
 
         String wholePath = XcloudProperties.getConfigMap().get(Global.CEPH_SSH_MOUNTPOINT) + cephFile.getTenantName()
@@ -237,7 +209,7 @@ public class CephFileServiceImpl extends AbstractCephFileService {
 
         File file = new File(wholePath);
         if (!file.exists()) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, path + CEPH_FILE_DOWNLOAD_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, path + CephConstant.CEPH_FILE_DOWNLOAD_NOT_EXIST);
         }
 
         response.setContentType(request.getServletContext().getMimeType(wholePath) + ";charset=utf-8");
@@ -253,8 +225,8 @@ public class CephFileServiceImpl extends AbstractCephFileService {
             IOUtils.copy(myStream, response.getOutputStream());
             response.flushBuffer();
         } catch (IOException e) {
-            log.error(CEPH_FILE_DOWNLOAD_FAILED, e);
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_DOWNLOAD, CEPH_FILE_DOWNLOAD_FAILED);
+            log.error(CephConstant.CEPH_FILE_DOWNLOAD_FAILED, e);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_DOWNLOAD, CephConstant.CEPH_FILE_DOWNLOAD_FAILED);
         }
         return true;
     }
@@ -266,11 +238,11 @@ public class CephFileServiceImpl extends AbstractCephFileService {
 
         CephFile cephFile = cephFileRepository.findById(cephFileId).get();
         if (null == cephFile) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CEPH_FILE_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.CEPH_FILE_NOT_EXIST);
         }
 
         if (StringUtils.isEmpty(filePath)) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CEPH_FILE_PATH_EMPTY);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.CEPH_FILE_PATH_EMPTY);
         }
 
         String fullPath = XcloudProperties.getConfigMap().get(Global.CEPH_SSH_MOUNTPOINT) + cephFile.getTenantName()
@@ -282,7 +254,7 @@ public class CephFileServiceImpl extends AbstractCephFileService {
             }
             file.delete();
         } else {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CEPH_FILE_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.CEPH_FILE_NOT_EXIST);
         }
 
         return true;
@@ -294,7 +266,7 @@ public class CephFileServiceImpl extends AbstractCephFileService {
 
         CephFile cephFile = cephFileRepository.findById(cephFileId).get();
         if (null == cephFile) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CEPH_FILE_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.CEPH_FILE_NOT_EXIST);
         }
 
         String fullPath = XcloudProperties.getConfigMap().get(Global.CEPH_SSH_MOUNTPOINT) + cephFile.getTenantName()
@@ -302,7 +274,7 @@ public class CephFileServiceImpl extends AbstractCephFileService {
 
         if (!FileUtils.delAllFile(fullPath)) {
             throw new ErrorMessageException(ReturnCode.CODE_CEPH_DELETE,
-                    String.format(CEPH_FILE_CLEAR_FAILED, cephFile.getName()));
+                    String.format(CephConstant.CEPH_FILE_CLEAR_FAILED, cephFile.getName()));
         }
 
         return true;
@@ -317,14 +289,14 @@ public class CephFileServiceImpl extends AbstractCephFileService {
         // check if the cephFile exists
         CephFile cephFile = cephFileRepository.findById(cephFileId).get();
         if (null == cephFile) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CEPH_FILE_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.CEPH_FILE_NOT_EXIST);
         }
 
         // check if the cephFile is occupied
         List<ServiceAndCephFile> serviceAndCephFiles = serviceAndCephFileRepository.findByCephFileId(cephFileId);
         if (serviceAndCephFiles.size() > 0) {
             throw new ErrorMessageException(ReturnCode.CODE_CEPH_OCCUPIED,
-                    String.format(CEPH_FILE_MOUNTED, cephFile.getName()));
+                    String.format(CephConstant.CEPH_FILE_MOUNTED, cephFile.getName()));
         }
 
         try {
@@ -337,7 +309,7 @@ public class CephFileServiceImpl extends AbstractCephFileService {
             // delete cephfile
             cephFileRepository.deleteById(cephFileId);
         } catch (Exception e) {
-            String msg = String.format(CEPH_FILE_DELETE_FAILED, cephFile.getName());
+            String msg = String.format(CephConstant.CEPH_FILE_DELETE_FAILED, cephFile.getName());
             log.error(msg, e);
             throw new ErrorMessageException(ReturnCode.CODE_CEPH_DELETE, msg);
         }
@@ -353,7 +325,7 @@ public class CephFileServiceImpl extends AbstractCephFileService {
             cephFile = cephFileOptional.get();
         }
         if (null == cephFile) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CEPH_FILE_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.CEPH_FILE_NOT_EXIST);
         }
 
         String fullPath = XcloudProperties.getConfigMap().get(Global.CEPH_SSH_MOUNTPOINT) + cephFile.getTenantName()
@@ -404,9 +376,9 @@ public class CephFileServiceImpl extends AbstractCephFileService {
                         + cephFile.getTenantName() + FILE_SPLIT + cephFile.getName();
                 cephFile.setUsed(fileSize(fullPath));
             } catch (ErrorMessageException e) {
-                String msg = String.format(CEPH_FILE_GET_RESOURCE_FAILED, cephFile.getName());
+                String msg = String.format(CephConstant.CEPH_FILE_GET_RESOURCE_FAILED, cephFile.getName());
                 LOG.error(msg, e);
-                cephFile.setUsed(CEPH_FILE_MIN_SIZE);
+                cephFile.setUsed(CephConstant.CEPH_FILE_MIN_SIZE);
             }
             serviceAndCephFile.setCephFile(cephFile);
         }
@@ -438,7 +410,7 @@ public class CephFileServiceImpl extends AbstractCephFileService {
         // check if the cephFile exists
         CephFile cephFile = cephFileRepository.findById(cephFileId).get();
         if (null == cephFile) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CEPH_FILE_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.CEPH_FILE_NOT_EXIST);
         }
 
         List<FileInfo> list = null;
@@ -463,9 +435,9 @@ public class CephFileServiceImpl extends AbstractCephFileService {
         if (new File(filePath).exists()) {
             hasUse = SftpUtil.getHasUsed(filePath);
         } else {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CEPH_FILE_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.CEPH_FILE_NOT_EXIST);
         }
-        double hasUseDouble = hasUse / HEX / HEX / HEX;
+        double hasUseDouble = hasUse / CephConstant.HEX / CephConstant.HEX / CephConstant.HEX;
         return hasUseDouble;
     }
 

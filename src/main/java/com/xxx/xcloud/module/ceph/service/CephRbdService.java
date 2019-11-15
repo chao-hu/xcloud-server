@@ -44,20 +44,16 @@ public interface CephRbdService {
      */
     boolean destroyCephRbdPool(String tenantName);
 
+ 
     /**
      * 新增块存储
      * @Title: add
-     * @Description: 新增块存储 
-     * @param tenantName 租户名
-     * @param createdBy 创建者
-     * @param projectId 项目信息
-     * @param rbdName 块名称
-     * @param size 大小（单位为M）
-     * @param description 块存储描述
-     * @return boolean 
+     * @Description: 新增块存储
+     * @param cephRbd
+     * @return CephRbd 
      * @throws
      */
-    boolean add(String tenantName, String createdBy, String projectId, String rbdName, double size, String description);
+    CephRbd add(CephRbd cephRbd);
 
     /**
      * 获取块存储详情

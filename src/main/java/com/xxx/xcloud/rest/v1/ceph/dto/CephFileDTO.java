@@ -3,11 +3,14 @@
  */
 package com.xxx.xcloud.rest.v1.ceph.dto;
 
+import java.util.Date;
+
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 import com.xxx.xcloud.common.Global;
+import com.xxx.xcloud.module.ceph.entity.CephFile;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -47,5 +50,19 @@ public class CephFileDTO {
 
     @ApiModelProperty(value = "创建人", required = false, example = "testUser", dataType = "String")
     private String createdBy;
+
+    
+    /**
+     * 构造CephFile
+     * @Title: getCephFile
+     * @Description: 构造CephFile
+     * @return CephFile 
+     * @throws
+     */
+    public CephFile getCephFile() {
+        return CephFile.builder().withCreateTime(new Date()).withDescription(description).withName(storageFileName)
+                .withTenantName(tenantName).withSize(storageFileSize).withCreateBy(createdBy).withProjectId(projectId)
+                .build();
+    }
 
 }

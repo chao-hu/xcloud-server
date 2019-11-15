@@ -1,4 +1,4 @@
-package com.xxx.xcloud.module.ceph.pojo;
+package com.xxx.xcloud.module.ceph.model;
 
 
 /**

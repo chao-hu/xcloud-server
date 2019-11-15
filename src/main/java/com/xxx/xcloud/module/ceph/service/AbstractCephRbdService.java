@@ -144,7 +144,7 @@ public abstract class AbstractCephRbdService implements CephRbdService {
 
     /**
      * @Description 检查Rados是否正常连接
-     * @throws AbstractCephException
+     * @throws ErrorMessageException
      */
     protected void checkCephRbdClient() {
         try {

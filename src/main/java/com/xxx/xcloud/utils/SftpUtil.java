@@ -24,14 +24,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.xxx.xcloud.module.ceph.pojo.FileInfo;
-import com.xxx.xcloud.module.ceph.pojo.FileUploadProgress;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
+import com.xxx.xcloud.module.ceph.model.FileInfo;
+import com.xxx.xcloud.module.ceph.model.FileUploadProgress;
 
 /**
  * SFTPUtil

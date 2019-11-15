@@ -25,6 +25,7 @@ import com.ceph.rbd.jna.RbdSnapInfo;
 import com.xxx.xcloud.client.ceph.CephClientFactory;
 import com.xxx.xcloud.common.ReturnCode;
 import com.xxx.xcloud.common.exception.ErrorMessageException;
+import com.xxx.xcloud.module.ceph.constant.CephConstant;
 import com.xxx.xcloud.module.ceph.entity.CephRbd;
 import com.xxx.xcloud.module.ceph.entity.CephSnap;
 import com.xxx.xcloud.module.ceph.entity.ServiceCephRbd;
@@ -47,82 +48,50 @@ import com.xxx.xcloud.utils.StringUtils;
 @Service
 public class CephRbdServiceImpl extends AbstractCephRbdService {
 
-    private static final String CEPH_RBD_ALREADY_EXIST = "块:%s已经存在";
-    private static final String CEPH_RBD_NOT_EXIST = "指定的块不存在";
-    private static final String CEPH_RBD_SIZE_ILLEGAL = "块存储大小:%s不合法";
-    private static final String CEPH_RBD_NAME_ILLEGAL = "块存储名称不合法，应由5到15位字母数字和下划线组成，以字母开头";
-    private static final String CEPH_RBD_CREATE_FAILED = "块:%s创建失败";
-    private static final String CEPH_RBD_MOUNTED = "块存储已经被挂载";
-    private static final String CEPH_RBD_MOUNT_FAILED = "id不存在无法修改";
-    private static final String CEPH_RBD_DELETE_FAILED = "租户:%s删除块或快照:%s时出现异常";
-    private static final String TENANT_NOT_EXIST = "租户:%s不存在";
-    private static final String SNAP_ALREADY_EXIST = "指定的快照:%s已经存在";
-    private static final String SNAP_CREATE_FAILED = "快照:%s创建失败";
-    private static final String CEPH_RBD_RESIZE_ILLEGAL = "扩容大小不合法，应大于之前的容量";
-    private static final String CEPH_RBD_RESIZE_FAILED = "块存储扩容失败";
-    private static final String SNAP_STRATEGY_RUNNING = "快照策略正在运行中";
-    private static final String SNAP_DELETE_FAILED = "快照删除失败";
-    private static final String SNAP_NOT_EXIST = "指定的快照不存在";
-    private static final String SNAP_ROLLBACK_FAILED = "快照回滚失败";
-    private static final String CEPH_RBD_HAS_SNAP = "块存储存在快照";
-    private static final String CEPH_RBD_HAS_STRATEGY = "块存储已经存在快照策略";
-    private static final String SNAP_STRATEGY_WEEK_ILLEGAL = "week参数不合法，应由0-6的数字组成，逗号隔开";
-    private static final String SNAP_STRATEGY_TIME_ILLEGAL = "time参数不合法，应由0-23的数字组成，逗号隔开";
-    private static final String SNAP_STRATEGE_ENDDATE_ILLEGAL = "endDate参数不合法，应非空且大于当前日期";
-    private static final String SNAP_STRATEGE_STATUS_ILLEGAL = "status参数不合法，应为0或者1";
-    private static final String SNAP_STRATEGE_NOT_EXIST = "指定的快照策略不存在";
-    private static final long HEX = 1024L;
-    private static final long FEATURES = 1L;
-
-    public static final int NAME_MIN_LENGTH = 4;
-    public static final int NAME_MAX_LENGTH = 15;
-    public static final double CEPH_RBD_MIN_SIZE = 0d;
-
     @Autowired
     @Qualifier("tenantServiceImpl")
     private ITenantService tenantService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean add(String tenantName, String createdBy, String projectId, String rbdName, double size,
-            String description) {
+    public CephRbd add(CephRbd cephRbd) {
 
         checkCephRbdClient();
 
         // check if the rbd exists
-        CephRbd cephRbd = cephRbdRepository.findByTenantNameAndName(tenantName, rbdName);
-        if (null != cephRbd) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_EXIST, String.format(CEPH_RBD_ALREADY_EXIST, rbdName));
+        CephRbd rbd = cephRbdRepository.findByTenantNameAndName(cephRbd.getTenantName(), cephRbd.getName());
+        if (null != rbd) {
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_EXIST, String.format(CephConstant.CEPH_RBD_ALREADY_EXIST, cephRbd.getName()));
         }
 
         // check if the tenant exists
-        Tenant tenant = tenantService.findTenantByTenantName(tenantName);
+        Tenant tenant = tenantService.findTenantByTenantName(cephRbd.getTenantName());
         if (null == tenant) {
             throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND,
-                    String.format(TENANT_NOT_EXIST, tenantName));
+                    String.format(CephConstant.TENANT_NOT_EXIST, cephRbd.getTenantName()));
         }
 
         // check size
-        if (size <= CEPH_RBD_MIN_SIZE) {
+        if (cephRbd.getSize() <= CephConstant.CEPH_RBD_MIN_SIZE) {
             throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM,
-                    String.format(CEPH_RBD_SIZE_ILLEGAL, size));
+                    String.format(CephConstant.CEPH_RBD_SIZE_ILLEGAL, cephRbd.getSize()));
         }
 
         // check rbdName
-        if (StringUtils.isEmpty(rbdName) || !StringUtils.isAccountName(rbdName, NAME_MIN_LENGTH, NAME_MAX_LENGTH)) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CEPH_RBD_NAME_ILLEGAL);
+        if (StringUtils.isEmpty(cephRbd.getName()) || !StringUtils.isAccountName(cephRbd.getName(), CephConstant.NAME_MIN_LENGTH, CephConstant.NAME_MAX_LENGTH)) {
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.CEPH_RBD_NAME_ILLEGAL);
         }
 
         // add rbd
         IoCTX ioctx = null;
         try {
-            ioctx = CephClientFactory.getCephRbdClient().ioCtxCreate(tenantName);
-            Rbd rbd = new Rbd(ioctx);
-            long sizeL = (long) size;
-            sizeL = sizeL * HEX * HEX * HEX;
-            rbd.create(rbdName, sizeL, FEATURES);
+            ioctx = CephClientFactory.getCephRbdClient().ioCtxCreate(cephRbd.getTenantName());
+            Rbd crbd = new Rbd(ioctx);
+            long sizeL = Double.doubleToLongBits(cephRbd.getSize());
+            sizeL = sizeL * CephConstant.HEXL * CephConstant.HEXL * CephConstant.HEXL;
+            crbd.create(cephRbd.getName(), sizeL, CephConstant.FEATURES);
         } catch (Exception e) {
-            String msg = String.format(CEPH_RBD_CREATE_FAILED, rbdName);
+            String msg = String.format(CephConstant.CEPH_RBD_CREATE_FAILED, cephRbd.getName());
             log.error(msg, e);
             throw new ErrorMessageException(ReturnCode.CODE_CEPH_CREATE, msg);
         }
@@ -134,12 +103,8 @@ public class CephRbdServiceImpl extends AbstractCephRbdService {
             }
         }
 
-        cephRbd = CephRbd.builder().withCreateTime(new Date()).withUpdateTime(new Date()).withDescription(description)
-                .withName(rbdName).withTenantName(tenantName).withSize(size).withCreatedBy(createdBy)
-                .withProjectId(projectId).build();
-
-        cephRbdRepository.save(cephRbd);
-        return true;
+        cephRbd = cephRbdRepository.save(cephRbd);
+        return cephRbd;
     }
 
     @Override
@@ -147,7 +112,7 @@ public class CephRbdServiceImpl extends AbstractCephRbdService {
         // check if the rbd exists
         Optional<CephRbd> cephRbdOpt = cephRbdRepository.findById(cephRbdId);
         if (!cephRbdOpt.isPresent()) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CEPH_RBD_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.CEPH_RBD_NOT_EXIST);
         }
 
         CephRbd cephRbd = cephRbdOpt.get();
@@ -206,14 +171,14 @@ public class CephRbdServiceImpl extends AbstractCephRbdService {
         // check if the cephrbd exists
         Optional<CephRbd> cephRbdOpt = cephRbdRepository.findById(cephRbdId);
         if (!cephRbdOpt.isPresent()) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CEPH_RBD_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.CEPH_RBD_NOT_EXIST);
         }
         CephRbd cephRbd = cephRbdOpt.get();
 
         // check if the cephrbd mounted
         ServiceCephRbd serviceCephRbd = serviceCephRbdRepository.findByCephRbdId(cephRbdId);
         if (serviceCephRbd != null) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_OCCUPIED, CEPH_RBD_MOUNTED);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_OCCUPIED, CephConstant.CEPH_RBD_MOUNTED);
         }
 
         // stop snapStrategy
@@ -237,7 +202,7 @@ public class CephRbdServiceImpl extends AbstractCephRbdService {
             rbd.close(rbdImage);
             rbd.remove(cephRbd.getName());
         } catch (Exception e) {
-            String msg = String.format(CEPH_RBD_DELETE_FAILED, cephRbd.getTenantName(), cephRbd.getName());
+            String msg = String.format(CephConstant.CEPH_RBD_DELETE_FAILED, cephRbd.getTenantName(), cephRbd.getName());
             log.error(msg, e);
             throw new ErrorMessageException(ReturnCode.CODE_CEPH_DELETE, msg);
         }
@@ -260,37 +225,37 @@ public class CephRbdServiceImpl extends AbstractCephRbdService {
         // check if the cephrbd exists
         Optional<CephRbd> cephRbdOpt = cephRbdRepository.findById(cephRbdId);
         if (!cephRbdOpt.isPresent()) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CEPH_RBD_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.CEPH_RBD_NOT_EXIST);
         }
         CephRbd cephRbd = cephRbdOpt.get();
 
         // check if the rbd is mounted
         ServiceCephRbd serviceCephRbd = serviceCephRbdRepository.findByCephRbdId(cephRbdId);
         if (serviceCephRbd != null) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_OCCUPIED, CEPH_RBD_MOUNTED);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_OCCUPIED, CephConstant.CEPH_RBD_MOUNTED);
         }
 
         // check if snapStrategy is running
         SnapStrategy snapStrategy = snapStrategyRepository.findByCephRbdId(cephRbdId);
         if (snapStrategy != null && snapStrategy.getStatus() == SnapStrategy.STATUS_RUNNING) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_OCCUPIED, SNAP_STRATEGY_RUNNING);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_OCCUPIED, CephConstant.SNAP_STRATEGY_RUNNING);
         }
 
         // check if some snaps exist
         List<CephSnap> cephSnaps = cephSnapRepository.findByCephRbdId(cephRbdId);
         if (cephSnaps != null && cephSnaps.size() > 0) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_OCCUPIED, CEPH_RBD_HAS_SNAP);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_OCCUPIED, CephConstant.CEPH_RBD_HAS_SNAP);
         }
 
         // check size(size must be greater than the elder)
         if (size <= cephRbd.getSize()) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CEPH_RBD_RESIZE_ILLEGAL);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.CEPH_RBD_RESIZE_ILLEGAL);
         }
 
         // check if tenant storage resource is enough
         Tenant tenant = tenantService.findTenantByTenantName(cephRbd.getTenantName());
         if (tenant == null) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, TENANT_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.TENANT_NOT_EXIST);
         }
 
         cephRbd.setSize(size);
@@ -303,11 +268,11 @@ public class CephRbdServiceImpl extends AbstractCephRbdService {
             Rbd rbd = new Rbd(ioctx);
             RbdImage rbdImage = rbd.open(cephRbd.getName());
             long sizeL = (long) size;
-            rbdImage.resize(sizeL * HEX * HEX * HEX);
+            rbdImage.resize(sizeL * CephConstant.HEXL * CephConstant.HEXL * CephConstant.HEXL);
             rbd.close(rbdImage);
         } catch (Exception e) {
-            log.error(CEPH_RBD_RESIZE_FAILED, e);
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_RESIZE, CEPH_RBD_RESIZE_FAILED);
+            log.error(CephConstant.CEPH_RBD_RESIZE_FAILED, e);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_RESIZE, CephConstant.CEPH_RBD_RESIZE_FAILED);
         }
         finally {
             if (CephClientFactory.getCephRbdClient() != null) {
@@ -327,19 +292,19 @@ public class CephRbdServiceImpl extends AbstractCephRbdService {
         // check if the cephrbd exists
         Optional<CephRbd> cephRbdOpt = cephRbdRepository.findById(cephRbdId);
         if (!cephRbdOpt.isPresent()) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CEPH_RBD_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.CEPH_RBD_NOT_EXIST);
         }
         CephRbd cephRbd = cephRbdOpt.get();
 
         // check if the snap exists
         if (null != cephSnapRepository.findByCephRbdIdAndName(cephRbdId, snapName)) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_EXIST, String.format(SNAP_ALREADY_EXIST, snapName));
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_EXIST, String.format(CephConstant.SNAP_ALREADY_EXIST, snapName));
         }
 
         // check snapName
-        if (StringUtils.isEmpty(snapName) || !StringUtils.isAccountName(snapName, NAME_MIN_LENGTH, NAME_MAX_LENGTH)) {
+        if (StringUtils.isEmpty(snapName) || !StringUtils.isAccountName(snapName, CephConstant.NAME_MIN_LENGTH, CephConstant.NAME_MAX_LENGTH)) {
             throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM,
-                    String.format(CEPH_RBD_NAME_ILLEGAL, snapName));
+                    String.format(CephConstant.CEPH_RBD_NAME_ILLEGAL, snapName));
         }
 
         // create snap
@@ -352,7 +317,7 @@ public class CephRbdServiceImpl extends AbstractCephRbdService {
             rbdImage.snapCreate(snapName);
             rbd.close(rbdImage);
         } catch (Exception e) {
-            String msg = String.format(SNAP_CREATE_FAILED, snapName);
+            String msg = String.format(CephConstant.SNAP_CREATE_FAILED, snapName);
             log.error(msg, e);
             throw new ErrorMessageException(ReturnCode.CODE_CEPH_CREATE, msg);
         }
@@ -379,14 +344,14 @@ public class CephRbdServiceImpl extends AbstractCephRbdService {
         // check if the cephrbd exists
         Optional<CephRbd> cephRbdOpt = cephRbdRepository.findById(cephRbdId);
         if (!cephRbdOpt.isPresent()) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CEPH_RBD_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.CEPH_RBD_NOT_EXIST);
         }
         CephRbd cephRbd = cephRbdOpt.get();
 
         // check if the snap exists
         Optional<CephSnap> cephSnapOpt = cephSnapRepository.findById(snapId);
         if (!cephSnapOpt.isPresent()) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, SNAP_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.SNAP_NOT_EXIST);
         }
         CephSnap cephSnap = cephSnapOpt.get();
 
@@ -399,8 +364,8 @@ public class CephRbdServiceImpl extends AbstractCephRbdService {
             rbdImage.snapRemove(cephSnap.getName());
             rbd.close(rbdImage);
         } catch (Exception e) {
-            log.error(SNAP_DELETE_FAILED, e);
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_DELETE, SNAP_DELETE_FAILED);
+            log.error(CephConstant.SNAP_DELETE_FAILED, e);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_DELETE, CephConstant.SNAP_DELETE_FAILED);
         }
         finally {
             if (CephClientFactory.getCephRbdClient() != null) {
@@ -423,14 +388,14 @@ public class CephRbdServiceImpl extends AbstractCephRbdService {
         // check if the cephrbd exists
         Optional<CephRbd> cephRbdOpt = cephRbdRepository.findById(cephRbdId);
         if (!cephRbdOpt.isPresent()) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CEPH_RBD_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.CEPH_RBD_NOT_EXIST);
         }
         CephRbd cephRbd = cephRbdOpt.get();
 
         // check if the snap exists
         Optional<CephSnap> cephSnapOpt = cephSnapRepository.findById(snapId);
         if (!cephSnapOpt.isPresent()) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, SNAP_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.SNAP_NOT_EXIST);
         }
         CephSnap cephSnap = cephSnapOpt.get();
 
@@ -443,8 +408,8 @@ public class CephRbdServiceImpl extends AbstractCephRbdService {
             rbdImage.snapRollBack(cephSnap.getName());
             rbd.close(rbdImage);
         } catch (Exception e) {
-            log.error(SNAP_ROLLBACK_FAILED, e);
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_ROLLBACK, SNAP_ROLLBACK_FAILED);
+            log.error(CephConstant.SNAP_ROLLBACK_FAILED, e);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_ROLLBACK, CephConstant.SNAP_ROLLBACK_FAILED);
         }
         finally {
             if (CephClientFactory.getCephRbdClient() != null) {
@@ -474,33 +439,33 @@ public class CephRbdServiceImpl extends AbstractCephRbdService {
         // check if the cephrbd exists
         Optional<CephRbd> cephRbdOpt = cephRbdRepository.findById(cephRbdId);
         if (!cephRbdOpt.isPresent()) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CEPH_RBD_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.CEPH_RBD_NOT_EXIST);
         }
 
         // check if the snapStrategy exists
         SnapStrategy snapStrategy = snapStrategyRepository.findByCephRbdId(cephRbdId);
         if (null != snapStrategy) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_EXIST, CEPH_RBD_HAS_STRATEGY);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_EXIST, CephConstant.CEPH_RBD_HAS_STRATEGY);
         }
 
         // check week
         if (!StringUtils.isWeekStrings(week)) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, SNAP_STRATEGY_WEEK_ILLEGAL);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.SNAP_STRATEGY_WEEK_ILLEGAL);
         }
 
         // check time
         if (!StringUtils.isTimeStrings(time)) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, SNAP_STRATEGY_TIME_ILLEGAL);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.SNAP_STRATEGY_TIME_ILLEGAL);
         }
 
         // check endDate
         if (endDate == null || endDate.compareTo(new Date()) < 0) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, SNAP_STRATEGE_ENDDATE_ILLEGAL);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.SNAP_STRATEGE_ENDDATE_ILLEGAL);
         }
 
         // check status
         if (status != SnapStrategy.STATUS_RUNNING && status != SnapStrategy.STATUS_STOP) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, SNAP_STRATEGE_STATUS_ILLEGAL);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_INVALID_PARAM, CephConstant.SNAP_STRATEGE_STATUS_ILLEGAL);
         }
 
         snapStrategy = SnapStrategy.builder().withCephRbdId(cephRbdId).withCreateTime(new Date())
@@ -523,13 +488,13 @@ public class CephRbdServiceImpl extends AbstractCephRbdService {
         // check if the cephrbd exists
         Optional<CephRbd> cephRbdOpt = cephRbdRepository.findById(cephRbdId);
         if (!cephRbdOpt.isPresent()) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CEPH_RBD_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.CEPH_RBD_NOT_EXIST);
         }
 
         // check if the snapStrategy exists
         SnapStrategy snapStrategy = snapStrategyRepository.findByCephRbdId(cephRbdId);
         if (null == snapStrategy) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, SNAP_STRATEGE_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.SNAP_STRATEGE_NOT_EXIST);
         }
 
         SnapStrategy newSnapStrategy = SnapStrategy.builder().withId(snapStrategy.getId()).withCephRbdId(cephRbdId)
@@ -556,7 +521,7 @@ public class CephRbdServiceImpl extends AbstractCephRbdService {
 
         // check if rbd exists
         if (snapStrategy == null) {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CEPH_RBD_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.CEPH_RBD_NOT_EXIST);
         }
 
         // delete ScheduledThreadPoolTool
@@ -581,14 +546,14 @@ public class CephRbdServiceImpl extends AbstractCephRbdService {
         ServiceCephRbd serviceCephRbd = serviceCephRbdRepository.findByIdAndServiceIdAndCephRbdId(id, serviceId,
                 cephRbdId);
         if (null != id && null == serviceCephRbd) {
-            throw new ErrorMessageException(ReturnCode.CODE_CHECK_PARAM_IS_NOT_EXIST, CEPH_RBD_MOUNT_FAILED);
+            throw new ErrorMessageException(ReturnCode.CODE_CHECK_PARAM_IS_NOT_EXIST, CephConstant.CEPH_RBD_MOUNT_FAILED);
         }
         if (serviceCephRbd != null) {
             serviceCephRbd.setMountPath(mountPath);
             serviceCephRbdRepository.save(serviceCephRbd);
         } else {
             if (serviceCephRbdRepository.findByCephRbdId(cephRbdId) != null) {
-                throw new ErrorMessageException(ReturnCode.CODE_CEPH_MOUNT, CEPH_RBD_MOUNTED);
+                throw new ErrorMessageException(ReturnCode.CODE_CEPH_MOUNT, CephConstant.CEPH_RBD_MOUNTED);
             }
 
             serviceCephRbd = ServiceCephRbd.builder().withCephRbdId(cephRbdId).withServiceId(serviceId)
@@ -604,7 +569,7 @@ public class CephRbdServiceImpl extends AbstractCephRbdService {
         if (serviceCephRbd != null) {
             serviceCephRbdRepository.delete(serviceCephRbd);
         } else {
-            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CEPH_RBD_NOT_EXIST);
+            throw new ErrorMessageException(ReturnCode.CODE_CEPH_NOT_FOUND, CephConstant.CEPH_RBD_NOT_EXIST);
         }
     }
 

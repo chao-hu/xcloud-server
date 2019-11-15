@@ -9,7 +9,7 @@
  * 修改内容：
  */
 
-package com.xxx.xcloud.module.ceph.pojo;
+package com.xxx.xcloud.module.ceph.model;
 
 import java.util.Date;
 

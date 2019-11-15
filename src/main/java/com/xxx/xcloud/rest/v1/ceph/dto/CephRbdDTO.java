@@ -3,11 +3,14 @@
  */
 package com.xxx.xcloud.rest.v1.ceph.dto;
 
+import java.util.Date;
+
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 import com.xxx.xcloud.common.Global;
+import com.xxx.xcloud.module.ceph.entity.CephRbd;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -47,5 +50,19 @@ public class CephRbdDTO {
 
     @ApiModelProperty(value = "创建人", required = false, example = "testUser", dataType = "String")
     private String createdBy;
+
+    /**
+     * 
+     * 构造CephRbd
+     * @Title: getCephRbd
+     * @Description: 构造CephRbd
+     * @return CephRbd 
+     * @throws
+     */
+    public CephRbd getCephRbd() {
+        return CephRbd.builder().withCreateTime(new Date()).withUpdateTime(new Date()).withDescription(description)
+                .withName(rbdName).withTenantName(tenantName).withSize(size).withCreatedBy(createdBy)
+                .withProjectId(projectId).build();
+    }
 
 }

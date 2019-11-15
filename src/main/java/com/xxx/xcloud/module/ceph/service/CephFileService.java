@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.xxx.xcloud.module.ceph.entity.CephFile;
 import com.xxx.xcloud.module.ceph.entity.ServiceAndCephFile;
-import com.xxx.xcloud.module.ceph.pojo.FileInfo;
+import com.xxx.xcloud.module.ceph.model.FileInfo;
 
 /**
  * 
@@ -46,20 +46,16 @@ public interface CephFileService {
      */
     boolean destroyCephFsRoot(String tenantName);
 
+    
     /**
      * 新增卷
      * @Title: add
      * @Description: 新增卷
-     * @param tenantName 租户名称
-     * @param createdBy 创建人
-     * @param projectId 项目信息
-     * @param name 卷名称
-     * @param size 卷大小
-     * @param description 描述信息
+     * @param cephFile
      * @return CephFile 
      * @throws
      */
-    CephFile add(String tenantName, String createdBy, String projectId, String name, double size, String description);
+    CephFile add(CephFile cephFile);
 
     /**
      * 卷内增加文件夹

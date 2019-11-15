@@ -3,7 +3,6 @@ package com.xxx.xcloud.rest.v1.ceph;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,13 +31,14 @@ import com.xxx.xcloud.common.Global;
 import com.xxx.xcloud.common.ReturnCode;
 import com.xxx.xcloud.common.XcloudProperties;
 import com.xxx.xcloud.common.exception.ErrorMessageException;
+import com.xxx.xcloud.module.ceph.constant.CephConstant;
 import com.xxx.xcloud.module.ceph.entity.CephFile;
 import com.xxx.xcloud.module.ceph.entity.CephRbd;
 import com.xxx.xcloud.module.ceph.entity.CephSnap;
 import com.xxx.xcloud.module.ceph.entity.SnapStrategy;
-import com.xxx.xcloud.module.ceph.pojo.CephBucket;
-import com.xxx.xcloud.module.ceph.pojo.FileInfo;
-import com.xxx.xcloud.module.ceph.pojo.ObjectInBucket;
+import com.xxx.xcloud.module.ceph.model.CephBucket;
+import com.xxx.xcloud.module.ceph.model.FileInfo;
+import com.xxx.xcloud.module.ceph.model.ObjectInBucket;
 import com.xxx.xcloud.module.ceph.service.CephFileService;
 import com.xxx.xcloud.module.ceph.service.CephObjectService;
 import com.xxx.xcloud.module.ceph.service.CephRbdService;
@@ -75,12 +75,6 @@ import io.swagger.annotations.ApiParam;
 @Validated
 public class CephController {
 
-    public static final String OPERATION_FORMAT = "format";
-    public static final String OPERATION_EXPAND = "expand";
-    public static final String OPERATION_ROLLBACK = "rollback";
-    public static final String BUCKET_NAME_SPLIT = "bucket";
-    public static Pattern ACCOUNT_PATTERN = Pattern.compile("^[a-zA-Z][a-zA-Z0-9_]{4,15}$");
-
     @Autowired
     private CephFileService cephFileService;
 
@@ -101,20 +95,11 @@ public class CephController {
     @ResponseBody
     @RequestMapping(value = { "/file" }, method = RequestMethod.POST)
     @ApiOperation(value = "新建文件存储卷", notes = "")
-    public ApiResult createCephFs(@Valid @RequestBody CephFileDTO json) {
+    public ApiResult createCephFs(@Valid @RequestBody CephFileDTO dto) {
 
-        // 解析参数
-        String tenantName = json.getTenantName();
-        String storageFileName = json.getStorageFileName();
-        Double storageFileSize = json.getStorageFileSize();
-        String description = json.getDescription();
-        String projectId = json.getProjectId();
-        String createdBy = json.getCreatedBy();
-
-        // 创建文件存储卷
-        CephFile cephFile = new CephFile();
+        CephFile cephFile = dto.getCephFile();
         try {
-            cephFile = cephFileService.add(tenantName, createdBy, projectId, storageFileName, storageFileSize, description);
+            cephFile = cephFileService.add(cephFile);
         } catch (ErrorMessageException e) {
             return new ApiResult(e.getCode(), e.getMessage());
         }
@@ -215,10 +200,12 @@ public class CephController {
                 cephFileService.upLoadFile(storageFileId, filePath, file);
                 result = new ApiResult(ReturnCode.CODE_SUCCESS, "文件存储卷内上传文件成功");
                 break;
+                
             case "download":
                 cephFileService.downLoadFile(storageFileId, fileName, request, response);
                 result = new ApiResult(ReturnCode.CODE_SUCCESS, "文件存储卷内下载文件成功");
                 break;
+                
             default:
                 result = new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NOT_EXIST, "操作不存在");
                 break;
@@ -300,6 +287,7 @@ public class CephController {
             @ApiImplicitParam(paramType = "query", name = "path", value = "路径", required = false, dataType = "String") })
     public ApiResult getCephFile(@PathVariable("storageFileId") String storageFileId,
             @RequestParam(value = "path", required = false) String path) {
+        
         List<FileInfo> fileList = null;
         try {
             fileList = cephFileService.listFiles(storageFileId, path);
@@ -317,22 +305,16 @@ public class CephController {
     @ResponseBody
     @RequestMapping(value = { "/rbd" }, method = RequestMethod.POST)
     @ApiOperation(value = "新建块存储", notes = "")
-    public ApiResult createRdb(@Valid @RequestBody CephRbdDTO json) {
+    public ApiResult createRdb(@Valid @RequestBody CephRbdDTO dto) {
 
-        String rbdName = json.getRbdName();
-        String description = json.getDescription();
-        String tenantName = json.getTenantName();
-        Double size = json.getSize();
-        String projectId = json.getProjectId();
-        String createdBy = json.getCreatedBy();
-
+        CephRbd cephRbd = dto.getCephRbd();
         try {
-            cephRbdService.add(tenantName, createdBy, projectId, rbdName, size, description);
+            cephRbd = cephRbdService.add(cephRbd);
         } catch (ErrorMessageException e) {
             return new ApiResult(e.getCode(), e.getMessage());
         }
 
-        return new ApiResult(ReturnCode.CODE_SUCCESS, "新建块存储成功");
+        return new ApiResult(ReturnCode.CODE_SUCCESS, cephRbd, "新建块存储成功");
     }
 
     /**
@@ -649,12 +631,12 @@ public class CephController {
     @ApiOperation(value = "新建桶", notes = "")
     public ApiResult createBucket(@Valid @RequestBody CephObjDTO json) {
 
-        if (!ACCOUNT_PATTERN.matcher(json.getBucketName()).matches()) {
+        if (!CephConstant.ACCOUNT_PATTERN.matcher(json.getBucketName()).matches()) {
             return new ApiResult(ReturnCode.CODE_CEPH_CREATE, "桶名称不合法，应由5到15位小写字母、数字和下划线组成，以字母开头");
         }
 
         try {
-            String bucketName = json.getProjectId() + BUCKET_NAME_SPLIT + json.getBucketName();
+            String bucketName = json.getProjectId() + CephConstant.BUCKET_NAME_SPLIT + json.getBucketName();
             cephObjectService.createBucket(json.getTenantName(), bucketName, json.getAccessControlList());
         } catch (ErrorMessageException e) {
             return new ApiResult(e.getCode(), e.getMessage());
@@ -696,7 +678,7 @@ public class CephController {
 
             for (Bucket bucket : buckets) {
                 String bName = bucket.getName();
-                int index = bName.indexOf(BUCKET_NAME_SPLIT);
+                int index = bName.indexOf(CephConstant.BUCKET_NAME_SPLIT);
                 if (index < 0) {
                     continue;
                 }
@@ -747,7 +729,7 @@ public class CephController {
         }
 
         try {
-            String bucketName = projectId + BUCKET_NAME_SPLIT + storageBucketName;
+            String bucketName = projectId + CephConstant.BUCKET_NAME_SPLIT + storageBucketName;
             cephObjectService.deleteBucket(tenantName, bucketName);
         } catch (ErrorMessageException e) {
             return new ApiResult(e.getCode(), e.getMessage());
@@ -784,7 +766,7 @@ public class CephController {
         List<ObjectInBucket> objectInBuckets = new ArrayList<ObjectInBucket>();
 
         try {
-            String bucketName = projectId + BUCKET_NAME_SPLIT + storageBucketName;
+            String bucketName = projectId + CephConstant.BUCKET_NAME_SPLIT + storageBucketName;
             s3ObjectSummaries = cephObjectService.listObjects(tenantName, bucketName);
 
             for (S3ObjectSummary s3ObjectSummary : s3ObjectSummaries) {
@@ -824,7 +806,7 @@ public class CephController {
         }
 
         try {
-            String bucketName = projectId + BUCKET_NAME_SPLIT + storageBucketName;
+            String bucketName = projectId + CephConstant.BUCKET_NAME_SPLIT + storageBucketName;
             cephObjectService.deleteObject(tenantName, bucketName, fileName);
         } catch (ErrorMessageException e) {
             return new ApiResult(e.getCode(), e.getMessage());
@@ -863,7 +845,7 @@ public class CephController {
         }
 
         try {
-            String bucketName = projectId + BUCKET_NAME_SPLIT + storageBucketName;
+            String bucketName = projectId + CephConstant.BUCKET_NAME_SPLIT + storageBucketName;
             switch (operation) {
             case "upload":
                 cephObjectService.upLoad(file, tenantName, acl, storageClass, bucketName);
