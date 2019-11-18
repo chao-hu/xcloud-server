@@ -97,7 +97,7 @@ public class CephController {
     @ApiOperation(value = "新建文件存储卷", notes = "")
     public ApiResult createCephFs(@Valid @RequestBody CephFileDTO dto) {
 
-        CephFile cephFile = dto.getCephFile();
+        CephFile cephFile = dto.buildCephFile();
         try {
             cephFile = cephFileService.add(cephFile);
         } catch (ErrorMessageException e) {
@@ -307,7 +307,7 @@ public class CephController {
     @ApiOperation(value = "新建块存储", notes = "")
     public ApiResult createRdb(@Valid @RequestBody CephRbdDTO dto) {
 
-        CephRbd cephRbd = dto.getCephRbd();
+        CephRbd cephRbd = dto.buildCephRbd();
         try {
             cephRbd = cephRbdService.add(cephRbd);
         } catch (ErrorMessageException e) {

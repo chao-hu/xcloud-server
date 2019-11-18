@@ -70,12 +70,12 @@ public class CronjobDTO {
     
     /**
      * 构造Cronjob对象
-     * @Title: getCronJob
+     * @Title: buildCronJob
      * @Description: 构造Cronjob对象
      * @return Cronjob 
      * @throws
      */
-    public Cronjob getCronJob(){
+    public Cronjob buildCronJob(){
         Cronjob cronjob = new Cronjob();
         cronjob.setCmd(getCmd());
         cronjob.setCpu(getCpu());

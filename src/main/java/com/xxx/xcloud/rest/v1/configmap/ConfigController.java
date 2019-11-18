@@ -63,7 +63,7 @@ public class ConfigController {
 
         ConfigTemplate config = null;
         try {
-            config = configService.add(dto.getConfigTemplate());
+            config = configService.add(dto.buildConfigTemplate());
         } catch (ErrorMessageException e) {
             return new ApiResult(e.getCode(), e.getMessage());
         }

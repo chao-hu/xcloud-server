@@ -54,12 +54,12 @@ public class CephFileDTO {
     
     /**
      * 构造CephFile
-     * @Title: getCephFile
+     * @Title: buildCephFile
      * @Description: 构造CephFile
      * @return CephFile 
      * @throws
      */
-    public CephFile getCephFile() {
+    public CephFile buildCephFile() {
         return CephFile.builder().withCreateTime(new Date()).withDescription(description).withName(storageFileName)
                 .withTenantName(tenantName).withSize(storageFileSize).withCreateBy(createdBy).withProjectId(projectId)
                 .build();

@@ -56,7 +56,7 @@ public class EnvController {
 
         EnvTemplate envTemplate = new EnvTemplate();
         try {
-            envTemplate = envService.add(dto.getEnvTemplate());
+            envTemplate = envService.add(dto.buildEnvTemplate());
         } catch (ErrorMessageException e) {
             return new ApiResult(e.getCode(), e.getMessage());
         }

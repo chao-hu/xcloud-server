@@ -53,12 +53,12 @@ public class ConfigDTO {
 
     /**
      * 构造ConfigTemplate对象
-     * @Title: getConfigTemplate
+     * @Title: buildConfigTemplate
      * @Description: 构造ConfigTemplate对象
      * @return ConfigTemplate 
      * @throws
      */
-    public ConfigTemplate getConfigTemplate(){
+    public ConfigTemplate buildConfigTemplate(){
         ConfigTemplate configTemplate = new ConfigTemplate();
         configTemplate.setConfigData(JSON.toJSONString(getConfigData()));
         configTemplate.setCreatedBy(getCreatedBy());

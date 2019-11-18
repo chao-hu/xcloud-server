@@ -52,12 +52,12 @@ public class EnvDTO {
     
     /**
      * 构造EnvTemplate对象
-     * @Title: getEnvTemplate
+     * @Title: buildEnvTemplate
      * @Description: 构造EnvTemplate对象
      * @return EnvTemplate 
      * @throws
      */
-    public EnvTemplate getEnvTemplate(){
+    public EnvTemplate buildEnvTemplate(){
         EnvTemplate envTemplate = new EnvTemplate();
         envTemplate.setCreatedBy(getCreatedBy());
         envTemplate.setEnvData(JSON.toJSONString(getEnvData()));

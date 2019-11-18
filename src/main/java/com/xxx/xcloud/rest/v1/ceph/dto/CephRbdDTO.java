@@ -54,12 +54,12 @@ public class CephRbdDTO {
     /**
      * 
      * 构造CephRbd
-     * @Title: getCephRbd
+     * @Title: buildCephRbd
      * @Description: 构造CephRbd
      * @return CephRbd 
      * @throws
      */
-    public CephRbd getCephRbd() {
+    public CephRbd buildCephRbd() {
         return CephRbd.builder().withCreateTime(new Date()).withUpdateTime(new Date()).withDescription(description)
                 .withName(rbdName).withTenantName(tenantName).withSize(size).withCreatedBy(createdBy)
                 .withProjectId(projectId).build();

@@ -55,7 +55,7 @@ public class CronController {
 
         Cronjob cronjob = new Cronjob();
         try {
-            cronjob = cronjobService.createCronjob(dto.getCronJob());
+            cronjob = cronjobService.createCronjob(dto.buildCronJob());
         } catch (ErrorMessageException e) {
             return new ApiResult(e.getCode(), e.getMessage());
         }
