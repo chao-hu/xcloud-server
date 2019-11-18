@@ -102,43 +102,41 @@ public class ServiceDTO {
 
     @ApiModelProperty(value = "健康检查List<ServiceHealth> 转成的json串", required = false, example = "json", dataType = "String")
     private String healthCheck;
-    
+
     @ApiModelProperty(value = "List<HostAliases>对象", required = false)
     private List<ServiceHostAliasesModelDTO> hostAliases;
-    
+
     @ApiModelProperty(value = "InitContainer对象", required = false)
     private ServiceInitContainerModelDTO initContainer;
 
     @ApiModelProperty(value = "是否使用APM监控 0:不使用，1:使用", required = true, example = "json", dataType = "Boolean")
     private Boolean isUsedApm;
 
-	public void setService(Service service){
-        this.setServiceName(service.getServiceName());
-        this.setCpu(service.getCpu());
-        this.setMemory(service.getMemory());
-        this.setInstance(service.getInstance());
-        this.setTenantName(service.getTenantName());
-        this.setImageId(service.getImageVersionId());
-        this.setCmd(service.getCmd());
-        this.setPortAndProtocol(JSON.parseObject(service.getPortAndProtocol()));
-        this.setEnvData(JSON.parseObject(service.getEnv()));
-        this.setIspodmutex(service.getIsPodMutex());
-        this.setDescription(service.getDescription());
-        this.setProjectId(service.getProjectId());
-        this.setCreatedBy(service.getCreatedBy());
-        this.setIsUsedApm(service.getIsUsedApm());
-        this.setGpu(service.getGpu());
+    public void build(Service service) {
+        setServiceName(service.getServiceName());
+        setCpu(service.getCpu());
+        setMemory(service.getMemory());
+        setInstance(service.getInstance());
+        setTenantName(service.getTenantName());
+        setImageId(service.getImageVersionId());
+        setCmd(service.getCmd());
+        setPortAndProtocol(JSON.parseObject(service.getPortAndProtocol()));
+        setEnvData(JSON.parseObject(service.getEnv()));
+        setIspodmutex(service.getIsPodMutex());
+        setDescription(service.getDescription());
+        setProjectId(service.getProjectId());
+        setCreatedBy(service.getCreatedBy());
+        setIsUsedApm(service.getIsUsedApm());
+        setGpu(service.getGpu());
         if (StringUtils.isNotEmpty(service.getHostAliases())) {
             List<ServiceHostAliasesModelDTO> hostAliasJsonList = JSON.parseObject(service.getHostAliases(),
-                    new TypeReference<List<ServiceHostAliasesModelDTO>>() {
-            });
-            this.setHostAliases(hostAliasJsonList);
+                    new TypeReference<List<ServiceHostAliasesModelDTO>>() {});
+            setHostAliases(hostAliasJsonList);
         }
-        if(StringUtils.isNotEmpty(service.getInitContainer())) {
-            ServiceInitContainerModelDTO serviceInitContainerModel= JSON.parseObject(service.getInitContainer(), 
-                    new TypeReference<ServiceInitContainerModelDTO>() {
-            });
-            this.setInitContainer(serviceInitContainerModel);
+        if (StringUtils.isNotEmpty(service.getInitContainer())) {
+            ServiceInitContainerModelDTO serviceInitContainerModel = JSON.parseObject(service.getInitContainer(),
+                    new TypeReference<ServiceInitContainerModelDTO>() {});
+            setInitContainer(serviceInitContainerModel);
         }
     }
 

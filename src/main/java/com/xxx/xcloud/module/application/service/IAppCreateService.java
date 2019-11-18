@@ -1,15 +1,11 @@
 package com.xxx.xcloud.module.application.service;
 
-import java.util.List;
-
 import com.xxx.xcloud.module.application.entity.Service;
-import com.xxx.xcloud.module.application.entity.ServiceHealth;
-import com.xxx.xcloud.module.application.entity.ServiceHostpath;
 import com.xxx.xcloud.rest.v1.service.model.ServiceDTO;
 import com.xxx.xcloud.rest.v1.service.model.ServiceRequest;
 
 /**
- * 
+ *
  * @author mengaijun
  * @Description: TODO
  * @date: 2019年11月4日 下午2:14:21
@@ -31,7 +27,7 @@ public interface IAppCreateService {
      * <p>
      * Description: 验证服务名称是否可用
      * </p>
-     * 
+     *
      * @param tenantName
      *            租户名称
      * @param serviceName
@@ -81,32 +77,4 @@ public interface IAppCreateService {
      */
     Service getServiceByNameAndTenantName(String serviceName, String tenantname);
 
-    /**
-     * Description:新增/修改服务的健康检查(服务必须在未启动/已停止/启动失败状态)
-     *
-     * @author LYJ
-     * @param serviceHealth
-     *            健康检查参数
-     * @return 成功返回true，失败抛出异常
-     */
-    Boolean updateServiceHealth(ServiceHealth serviceHealth);
-
-    /**
-     * Description:获取服务的健康检查
-     *
-     * @author LYJ
-     * @param serviceId
-     *            服务ID
-     * @return List<ServiceHealth>
-     */
-    List<ServiceHealth> getServiceHealth(String serviceId);
-
-    /**
-     * Description:新增/修改服务的本地存储(服务必须在未启动/已停止/启动失败状态)
-     *
-     * @author LYJ
-     * @param serviceHostpath
-     * @return 成功返回true，失败抛出异常
-     */
-    Boolean updateServiceHostpath(ServiceHostpath serviceHostpath);
 }

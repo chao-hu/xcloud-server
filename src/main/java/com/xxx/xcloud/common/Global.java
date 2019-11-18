@@ -112,7 +112,19 @@ public class Global {
      */
     public static final byte OPERATION_UPDATE_FAILED = 7;
 
-    public static final String DEVOPS_PLUGIN_GRADLE = "DEVOPS_PLUGIN_GRADLE";//DEVOPSGRADLE插件版本
+    public static final String DEVOPS_PLUGIN_GRADLE = "DEVOPS_PLUGIN_GRADLE";// DEVOPSGRADLE插件版本
+
+    /**
+     *  服务端口协议
+     */
+    /**
+     * @Fields: TCP
+     */
+    public static final String SERVICE_PORT_TCP = "TCP";
+    /**
+     * @Fields: UDP
+     */
+    public static final String SERVICE_PORT_UDP = "UDP";
 
     /**
      *  服务亲和状态
@@ -252,12 +264,11 @@ public class Global {
     /**
      * @Fields: ingress域
      */
-    private static final List<String> INGRESS_DOMAIN_TYPE = Arrays
-            .asList("cn", "ren", "wang", "citic", "top", "sohu", "xin", "com", "net", "xyz", "vip", "work", "law",
-                    "beer", "club", "shop", "site", "ink", "info", "mobi", "red", "pro", "kim", "ltd", "group", "auto",
-                    "link", "biz", "fun", "online", "store", "tech", "art", "design", "wiki", "love", "center", "video",
-                    "social", "team", "show", "cool", "zone", "world", "today", "city", "chat", "company", "live",
-                    "fund", "gold", "plus", "guru", "run", "pub", "email", "life");
+    private static final List<String> INGRESS_DOMAIN_TYPE = Arrays.asList("cn", "ren", "wang", "citic", "top", "sohu",
+            "xin", "com", "net", "xyz", "vip", "work", "law", "beer", "club", "shop", "site", "ink", "info", "mobi",
+            "red", "pro", "kim", "ltd", "group", "auto", "link", "biz", "fun", "online", "store", "tech", "art",
+            "design", "wiki", "love", "center", "video", "social", "team", "show", "cool", "zone", "world", "today",
+            "city", "chat", "company", "live", "fund", "gold", "plus", "guru", "run", "pub", "email", "life");
 
     /**
      * @Title: getIngressDomainType
@@ -605,4 +616,3 @@ public class Global {
     public static final String MOUNTCEPHFILE_SERVICE = "service";
     public static final String MOUNTCEPHFILE_CONFIGBUS = "springcloud-configbus";
 }
-

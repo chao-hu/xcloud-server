@@ -32,6 +32,7 @@ import com.xxx.xcloud.module.application.repository.ServiceAffinityRepository;
 import com.xxx.xcloud.module.application.repository.ServiceHealthRepository;
 import com.xxx.xcloud.module.application.repository.ServiceHostpathRepository;
 import com.xxx.xcloud.module.application.repository.ServiceRepository;
+import com.xxx.xcloud.module.application.service.IAppConfigService;
 import com.xxx.xcloud.module.ceph.entity.ServiceAndCephFile;
 import com.xxx.xcloud.module.ceph.entity.ServiceCephRbd;
 import com.xxx.xcloud.module.ceph.repository.ServiceCephRbdRepository;
@@ -54,7 +55,7 @@ import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.ServiceSpec;
 
 /**
- * 
+ *
  * @author mengaijun
  * @Description: TODO
  * @date: 2019年11月4日 上午11:35:10
@@ -79,6 +80,9 @@ public class AppCreateServiceImpl implements com.xxx.xcloud.module.application.s
     @Autowired
     @Qualifier("tenantServiceImpl")
     private ITenantService tenantService;
+
+    @Autowired
+    private IAppConfigService appConfigService;
 
     @Autowired
     private ConfigService configService;
@@ -235,7 +239,7 @@ public class AppCreateServiceImpl implements com.xxx.xcloud.module.application.s
 
         try {
             Service service = getServiceById(serviceId);
-            swServiceModel.setService(service);
+            swServiceModel.build(service);
 
             List<ServiceHealth> healthCheck = serviceHealthRepository.findByServiceId(serviceId);
             if (healthCheck != null && healthCheck.size() > 0) {
@@ -400,7 +404,7 @@ public class AppCreateServiceImpl implements com.xxx.xcloud.module.application.s
 
     /**
      * update
-     * 
+     *
      * @param apiService
      *            void
      * @date: 2019年11月15日 上午10:51:44
@@ -410,8 +414,7 @@ public class AppCreateServiceImpl implements com.xxx.xcloud.module.application.s
         if (!StringUtils.isEmpty(apiService.getConfig())) {
             try {
                 Map<String, String> configs = JSON.parseObject(apiService.getConfig(),
-                        new TypeReference<Map<String, String>>() {
-                        });
+                        new TypeReference<Map<String, String>>() {});
                 configService.mountSave(apiService.getId(), configs);
             } catch (Exception e) {
                 LOG.error("保存服务配置信息失败 ", e);
@@ -422,7 +425,7 @@ public class AppCreateServiceImpl implements com.xxx.xcloud.module.application.s
 
     /**
      * update
-     * 
+     *
      * @param apiService
      *            void
      * @date: 2019年11月15日 上午10:43:24
@@ -431,8 +434,7 @@ public class AppCreateServiceImpl implements com.xxx.xcloud.module.application.s
         if (!StringUtils.isEmpty(apiService.getStorageFile())) {
             try {
                 Map<String, String> cephFiles = JSON.parseObject(apiService.getStorageFile(),
-                        new TypeReference<Map<String, String>>() {
-                        });
+                        new TypeReference<Map<String, String>>() {});
                 for (String cephFileId : cephFiles.keySet()) {
                     ServiceAndCephFile serviceAndCephFile = new ServiceAndCephFile();
                     serviceAndCephFile.setServiceId(apiService.getId());
@@ -450,7 +452,7 @@ public class AppCreateServiceImpl implements com.xxx.xcloud.module.application.s
 
     /**
      * update
-     * 
+     *
      * @param apiService
      * @date: 2019年11月15日 上午10:42:49
      */
@@ -458,8 +460,7 @@ public class AppCreateServiceImpl implements com.xxx.xcloud.module.application.s
         if (!StringUtils.isEmpty(apiService.getStorageRbd())) {
             try {
                 Map<String, String> cephRdbs = JSON.parseObject(apiService.getStorageRbd(),
-                        new TypeReference<Map<String, String>>() {
-                        });
+                        new TypeReference<Map<String, String>>() {});
                 for (String cephRbdId : cephRdbs.keySet()) {
                     cephRbdService.mountSave(null, apiService.getId(), cephRbdId, cephRdbs.get(cephRbdId));
                 }
@@ -472,7 +473,7 @@ public class AppCreateServiceImpl implements com.xxx.xcloud.module.application.s
 
     /**
      * update StorageLocal
-     * 
+     *
      * @param apiService
      * @date: 2019年11月15日 上午10:08:26
      */
@@ -480,14 +481,13 @@ public class AppCreateServiceImpl implements com.xxx.xcloud.module.application.s
         if (!StringUtils.isEmpty(apiService.getStorageLocal())) {
             try {
                 Map<String, String> hostpaths = JSON.parseObject(apiService.getStorageLocal(),
-                        new TypeReference<Map<String, String>>() {
-                        });
+                        new TypeReference<Map<String, String>>() {});
                 for (String hostPath : hostpaths.keySet()) {
                     ServiceHostpath serviceHostpath = new ServiceHostpath();
                     serviceHostpath.setServiceId(apiService.getId());
                     serviceHostpath.setHostPath(hostPath);
                     serviceHostpath.setMountPath(hostpaths.get(hostPath));
-                    updateServiceHostpath(serviceHostpath);
+                    appConfigService.updateServiceHostpath(serviceHostpath);
                 }
             } catch (Exception e) {
                 LOG.error("保存服务本地存储信息失败 ", e);
@@ -498,7 +498,7 @@ public class AppCreateServiceImpl implements com.xxx.xcloud.module.application.s
 
     /**
      * update NodeAffinity
-     * 
+     *
      * @param apiService
      * @date: 2019年11月15日 上午10:03:20
      */
@@ -518,7 +518,7 @@ public class AppCreateServiceImpl implements com.xxx.xcloud.module.application.s
 
     /**
      * 更新HelthCheck
-     * 
+     *
      * @param apiService
      * @date: 2019年11月15日 上午10:00:58
      */
@@ -528,33 +528,13 @@ public class AppCreateServiceImpl implements com.xxx.xcloud.module.application.s
                 List<ServiceHealth> healthList = apiService.getHealthCheck();
                 for (ServiceHealth serviceHealth : healthList) {
                     serviceHealth.setServiceId(apiService.getId());
-                    updateServiceHealth(serviceHealth);
+                    appConfigService.updateServiceHealth(serviceHealth);
                 }
             } catch (Exception e) {
                 LOG.error("保存服务健康检查信息失败", e);
                 throw new ErrorMessageException(ReturnCode.CODE_SQL_SAVE_INFO_FAILED, "保存服务健康检查信息失败 ");
             }
         }
-    }
-
-    @Override
-    public Boolean updateServiceHostpath(ServiceHostpath serviceHostpath) {
-        Service service = getServiceById(serviceHostpath.getServiceId());
-        if (null == service) {
-            LOG.info("服务不存在");
-            throw new ErrorMessageException(ReturnCode.CODE_CHECK_PARAM_IS_NOT_EXIST, "服务不存在");
-        }
-        setRestartFlagTrue(service);
-        try {
-            serviceHostpathRepository.save(serviceHostpath);
-            service = serviceRepository.save(service);
-        } catch (Exception e) {
-            LOG.error("服务:" + service.getServiceName() + "本地存储保存失败", e);
-            throw new ErrorMessageException(ReturnCode.CODE_SQL_SAVE_INFO_FAILED,
-                    "服务:" + service.getServiceName() + "本地存储保存失败");
-        }
-        LOG.info("服务:" + service.getServiceName() + "本地存储保存成功");
-        return true;
     }
 
     /**
@@ -599,8 +579,7 @@ public class AppCreateServiceImpl implements com.xxx.xcloud.module.application.s
         if (!StringUtils.isEmpty(service.getPortAndProtocol())) {
             // 获取用户指定的暴露端口
             Map<String, String> portAndProtocol = JSON.parseObject(service.getPortAndProtocol(),
-                    new TypeReference<Map<String, String>>() {
-                    });
+                    new TypeReference<Map<String, String>>() {});
             Set<Entry<String, String>> entries = portAndProtocol.entrySet();
             for (@SuppressWarnings(RAW_TYPES)
             Entry entry : entries) {
@@ -630,57 +609,4 @@ public class AppCreateServiceImpl implements com.xxx.xcloud.module.application.s
         return k8sService;
     }
 
-    public static final int TWO = 2;
-
-    @Override
-    public Boolean updateServiceHealth(ServiceHealth serviceHealth) {
-        Service service = getServiceById(serviceHealth.getServiceId());
-        setRestartFlagTrue(service);
-        List<ServiceHealth> serviceHealths = getServiceHealth(serviceHealth.getServiceId());
-        if (serviceHealths != null && serviceHealths.size() > TWO) {
-            throw new ErrorMessageException(ReturnCode.CODE_SQL_SAVE_INFO_FAILED,
-                    "只允许服务:" + service.getServiceName() + "保存至多两条健康检查数据");
-        }
-        try {
-            serviceHealthRepository.save(serviceHealth);
-            service = serviceRepository.save(service);
-        } catch (Exception e) {
-            LOG.error("服务:" + service.getServiceName() + "健康检查保存失败", e);
-            throw new ErrorMessageException(ReturnCode.CODE_SQL_SAVE_INFO_FAILED,
-                    "服务:" + service.getServiceName() + "健康检查保存失败");
-        }
-        LOG.info("服务:" + service.getServiceName() + "健康检查保存成功");
-        return true;
-    }
-
-    @Override
-    public List<ServiceHealth> getServiceHealth(String serviceId) {
-        Service service = getServiceById(serviceId);
-        List<ServiceHealth> serviceHealths = null;
-        try {
-            serviceHealths = serviceHealthRepository.findByServiceId(serviceId);
-        } catch (Exception e) {
-            LOG.error("服务:" + service.getServiceName() + "健康检查查询失败", e);
-            throw new ErrorMessageException(ReturnCode.CODE_SQL_FIND_ONE_FAILED,
-                    "服务:" + service.getServiceName() + "健康检查查询失败");
-        }
-        LOG.info("服务:" + service.getServiceName() + "健康检查查询成功");
-        return serviceHealths;
-    }
-
-    /**
-     *
-     * <p>
-     * Description: 服务在启动中或运行中，设置服务重新生效字段为true
-     * </p>
-     *
-     * @param service
-     */
-    private void setRestartFlagTrue(Service service) {
-        if (Global.OPERATION_RUNNING == service.getStatus() || Global.OPERATION_STARTING == service.getStatus()
-                || Global.OPERATION_UPDATING == service.getStatus()
-                || Global.OPERATION_UPDATE_FAILED == service.getStatus()) {
-            service.setIsRestartEffect(true);
-        }
-    }
 }
