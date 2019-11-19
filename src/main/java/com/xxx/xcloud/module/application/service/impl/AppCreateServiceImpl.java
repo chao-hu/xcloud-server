@@ -17,7 +17,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.xxx.xcloud.client.kubernetes.KubernetesClientFactory;
 import com.xxx.xcloud.common.Global;
@@ -44,7 +43,12 @@ import com.xxx.xcloud.module.image.entity.Image;
 import com.xxx.xcloud.module.image.service.ImageService;
 import com.xxx.xcloud.module.tenant.entity.Tenant;
 import com.xxx.xcloud.module.tenant.service.ITenantService;
+import com.xxx.xcloud.rest.v1.service.model.ServiceCephFileAddDTO;
+import com.xxx.xcloud.rest.v1.service.model.ServiceCephRbdAddDTO;
+import com.xxx.xcloud.rest.v1.service.model.ServiceConfigAddDTO;
 import com.xxx.xcloud.rest.v1.service.model.ServiceDTO;
+import com.xxx.xcloud.rest.v1.service.model.ServiceHealthUpdateDTO;
+import com.xxx.xcloud.rest.v1.service.model.ServiceLocalAddDTO;
 import com.xxx.xcloud.rest.v1.service.model.ServiceRequest;
 import com.xxx.xcloud.utils.StringUtils;
 
@@ -243,11 +247,15 @@ public class AppCreateServiceImpl implements com.xxx.xcloud.module.application.s
 
             List<ServiceHealth> healthCheck = serviceHealthRepository.findByServiceId(serviceId);
             if (healthCheck != null && healthCheck.size() > 0) {
+                List<ServiceHealthUpdateDTO> healthChecks = new ArrayList<ServiceHealthUpdateDTO>();
                 for (int i = 0; i < healthCheck.size(); i++) {
-                    healthCheck.get(i).setId(null);
-                    healthCheck.get(i).setServiceId(null);
+                    ServiceHealthUpdateDTO health = new ServiceHealthUpdateDTO();
+                    health.build(healthCheck.get(i));
+                    health.setId(null);
+
+                    healthChecks.add(health);
                 }
-                swServiceModel.setHealthCheck(JSON.toJSONString(healthCheck));
+                swServiceModel.setHealthCheck(healthChecks);
             }
 
             ServiceAffinity serviceAffinity = serviceAffinityRepository.findByServiceId(serviceId);
@@ -260,38 +268,50 @@ public class AppCreateServiceImpl implements com.xxx.xcloud.module.application.s
 
             List<ServiceConfig> configs = configService.listMount(serviceId);
             if (configs != null && configs.size() > 0) {
-                JSONObject configMap = new JSONObject(16);
+                List<ServiceConfigAddDTO> list = new ArrayList<ServiceConfigAddDTO>();
                 for (ServiceConfig serviceConfig : configs) {
-                    configMap.put(serviceConfig.getConfigTemplateId(), serviceConfig.getPath());
+                    ServiceConfigAddDTO obj = new ServiceConfigAddDTO();
+                    obj.setConfigTemplateId(serviceConfig.getConfigTemplateId());
+                    obj.setPath(serviceConfig.getPath());
+                    list.add(obj);
                 }
-                swServiceModel.setConfig(configMap);
+                swServiceModel.setConfig(list);
             }
 
             List<ServiceAndCephFile> cephFiles = cephFileService.listMountInService(serviceId);
             if (cephFiles != null && cephFiles.size() > 0) {
-                JSONObject cephFileMap = new JSONObject(16);
+                List<ServiceCephFileAddDTO> list = new ArrayList<ServiceCephFileAddDTO>();
                 for (ServiceAndCephFile serviceAndCephFile : cephFiles) {
-                    cephFileMap.put(serviceAndCephFile.getCephFileId(), serviceAndCephFile.getMountPath());
+                    ServiceCephFileAddDTO obj = new ServiceCephFileAddDTO();
+                    obj.setCephFileId(serviceAndCephFile.getCephFileId());
+                    obj.setMountPath(serviceAndCephFile.getMountPath());
+                    list.add(obj);
                 }
-                swServiceModel.setStorageFile(cephFileMap);
+                swServiceModel.setStorageFile(list);
             }
 
             List<ServiceCephRbd> cephRbds = serviceCephRbdRepository.findByServiceId(serviceId);
             if (cephRbds != null && cephRbds.size() > 0) {
-                JSONObject cephRbdMap = new JSONObject(16);
+                List<ServiceCephRbdAddDTO> list = new ArrayList<ServiceCephRbdAddDTO>();
                 for (ServiceCephRbd serviceCephRbd : cephRbds) {
-                    cephRbdMap.put(serviceCephRbd.getCephRbdId(), serviceCephRbd.getMountPath());
+                    ServiceCephRbdAddDTO obj = new ServiceCephRbdAddDTO();
+                    obj.setCephRbdId(serviceCephRbd.getCephRbdId());
+                    obj.setMountPath(serviceCephRbd.getMountPath());
+                    list.add(obj);
                 }
-                swServiceModel.setStorageRbd(cephRbdMap);
+                swServiceModel.setStorageRbd(list);
             }
 
             List<ServiceHostpath> hostpaths = serviceHostpathRepository.findByServiceId(serviceId);
             if (hostpaths != null && hostpaths.size() > 0) {
-                JSONObject hostpathMap = new JSONObject(16);
+                List<ServiceLocalAddDTO> list = new ArrayList<ServiceLocalAddDTO>();
                 for (ServiceHostpath serviceHostpath : hostpaths) {
-                    hostpathMap.put(serviceHostpath.getHostPath(), serviceHostpath.getMountPath());
+                    ServiceLocalAddDTO obj = new ServiceLocalAddDTO();
+                    obj.setHostPath(serviceHostpath.getHostPath());
+                    obj.setMountPath(serviceHostpath.getMountPath());
+                    list.add(obj);
                 }
-                swServiceModel.setStorageLocal(hostpathMap);
+                swServiceModel.setStorageLocal(list);
             }
 
         } catch (Exception e) {

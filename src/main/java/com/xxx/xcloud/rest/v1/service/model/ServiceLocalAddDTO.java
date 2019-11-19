@@ -7,18 +7,15 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
- * @ClassName: ServiceLocalUpdateDTO
- * @Description: 修改本地存储模版
+ * @ClassName: ServiceLocalAddDTO
+ * @Description: 新增本地存储模版
  * @author zyh
  * @date 2019年10月28日
  *
  */
 @Data
-@ApiModel(value = "修改本地存储模版")
-public class ServiceLocalUpdateDTO {
-
-    @ApiModelProperty(value = "service和本地存储关联ID", required = true, example = "", dataType = "String")
-    private String id;
+@ApiModel(value = "新增本地存储模版")
+public class ServiceLocalAddDTO {
 
     @ApiModelProperty(value = "主机路径", required = true, example = "/test", dataType = "String")
     @NotBlank(message = "主机路径为空")

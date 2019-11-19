@@ -1,6 +1,8 @@
 package com.xxx.xcloud.rest.v1.service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -26,6 +28,7 @@ import com.xxx.xcloud.common.ApiResult;
 import com.xxx.xcloud.common.Global;
 import com.xxx.xcloud.common.ReturnCode;
 import com.xxx.xcloud.common.exception.ErrorMessageException;
+import com.xxx.xcloud.module.application.entity.HttpData;
 import com.xxx.xcloud.module.application.entity.Service;
 import com.xxx.xcloud.module.application.entity.ServiceHealth;
 import com.xxx.xcloud.module.application.service.IAppCreateService;
@@ -33,7 +36,12 @@ import com.xxx.xcloud.module.image.model.ImageDetail;
 import com.xxx.xcloud.module.image.service.ImageService;
 import com.xxx.xcloud.module.tenant.entity.Tenant;
 import com.xxx.xcloud.module.tenant.service.ITenantService;
+import com.xxx.xcloud.rest.v1.service.model.ServiceCephFileAddDTO;
+import com.xxx.xcloud.rest.v1.service.model.ServiceCephRbdAddDTO;
+import com.xxx.xcloud.rest.v1.service.model.ServiceConfigAddDTO;
 import com.xxx.xcloud.rest.v1.service.model.ServiceDTO;
+import com.xxx.xcloud.rest.v1.service.model.ServiceHealthUpdateDTO;
+import com.xxx.xcloud.rest.v1.service.model.ServiceLocalAddDTO;
 import com.xxx.xcloud.rest.v1.service.model.ServiceRequest;
 import com.xxx.xcloud.utils.StringUtils;
 
@@ -43,7 +51,7 @@ import io.swagger.annotations.ApiOperation;
 
 /**
  * service创建
- * 
+ *
  * @author mengaijun
  * @Description: TODO
  * @date: 2019年11月4日 上午10:10:05
@@ -73,13 +81,13 @@ public class ServiceCreateController {
     @RequestMapping(value = { "" }, method = RequestMethod.POST)
     @ApiOperation(value = "创建服务", notes = "")
     public ApiResult createService(@Valid @RequestBody ServiceDTO json) {
-
+        LOG.info("========================serviceDTO:" + JSON.toJSONString(json));
         // 校验必传参数
         String tenantName = json.getTenantName();
         Double memory = json.getMemory() * 1024;
         Double cpu = json.getCpu();
-        int gpu = json.getGpu();
-        String imageVersionId = json.getImageId();
+        Integer gpu = json.getGpu();
+        String imageVersionId = json.getImageVersionId();
         int instance = json.getInstance();
         String serviceName = json.getServiceName();
         JSONObject portAndProtocol = json.getPortAndProtocol();
@@ -225,7 +233,7 @@ public class ServiceCreateController {
 
     /**
      * check
-     * 
+     *
      * @param tenantName
      * @param serviceName
      * @param imageVersionId
@@ -238,7 +246,7 @@ public class ServiceCreateController {
      * @date: 2019年11月4日 上午10:39:37
      */
     private ApiResult checkCreateParam(String tenantName, String serviceName, String imageVersionId, int instance,
-            Double cpu, Double memory, JSONObject portAndProtocol, int gpu) {
+            Double cpu, Double memory, JSONObject portAndProtocol, Integer gpu) {
 
         ApiResult result = null;
 
@@ -276,7 +284,7 @@ public class ServiceCreateController {
         }
 
         // 校验gpu
-        if (gpu < 0) {
+        if (null != gpu && gpu < 0) {
             return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NOT_FORMAT, "GPU应该大于等于0");
         }
         return null;
@@ -284,7 +292,7 @@ public class ServiceCreateController {
 
     /**
      * check
-     * 
+     *
      * @param tenantName
      * @return ApiResult
      * @date: 2019年11月4日 上午10:39:44
@@ -305,7 +313,7 @@ public class ServiceCreateController {
 
     /**
      * check
-     * 
+     *
      * @param serviceName
      * @param tenantName
      * @return ApiResult
@@ -329,7 +337,7 @@ public class ServiceCreateController {
 
     /**
      * check
-     * 
+     *
      * @param imageVersionid
      * @return ApiResult
      * @date: 2019年11月4日 上午10:39:55
@@ -354,7 +362,7 @@ public class ServiceCreateController {
 
     /**
      * 将对象转为json格式字符串
-     * 
+     *
      * @param obj
      * @return String
      * @date: 2019年11月14日 下午3:41:34
@@ -369,7 +377,7 @@ public class ServiceCreateController {
 
     /**
      * check
-     * 
+     *
      * @param json
      * @return ServiceRequest
      * @date: 2019年11月4日 上午10:40:00
@@ -377,12 +385,11 @@ public class ServiceCreateController {
     private ServiceRequest generateResource(ServiceDTO json) {
         ServiceRequest serviceRequest = new ServiceRequest();
         serviceRequest.setCmd(json.getCmd());
-        serviceRequest.setConfig(toJSONString(json.getConfig()));
         serviceRequest.setCpu(json.getCpu());
         serviceRequest.setCreateTime(new Date());
         serviceRequest.setDescription(json.getDescription());
         serviceRequest.setEnv(toJSONString(json.getEnvData()));
-        serviceRequest.setImageVersionId(json.getImageId());
+        serviceRequest.setImageVersionId(json.getImageVersionId());
         serviceRequest.setInstance(json.getInstance());
         serviceRequest.setMemory(json.getMemory());
         serviceRequest.setNodeAffinity(json.getNodeAffinity());
@@ -390,17 +397,48 @@ public class ServiceCreateController {
         serviceRequest.setServiceAffinity(json.getServiceAffinity());
         serviceRequest.setServiceAffinityType(json.getServiceAffinityType());
         serviceRequest.setServiceName(json.getServiceName());
-        serviceRequest.setStorageFile(toJSONString(json.getStorageFile()));
-        serviceRequest.setStorageLocal(toJSONString(json.getStorageLocal()));
-        serviceRequest.setStorageRbd(toJSONString(json.getStorageRbd()));
         serviceRequest.setTenantName(json.getTenantName());
         serviceRequest.setIsPodMutex(json.getIspodmutex());
         serviceRequest.setCreatedBy(json.getCreatedBy());
         serviceRequest.setProjectId(json.getProjectId());
         serviceRequest.setPortAndProtocol(toJSONString(json.getPortAndProtocol()));
-        serviceRequest.setHealthCheck(JSONObject.parseArray(json.getHealthCheck(), ServiceHealth.class));
+        generateHealthCheck(json.getHealthCheck(), serviceRequest);
         serviceRequest.setIsUsedApm(json.getIsUsedApm());
-        serviceRequest.setGpu(json.getGpu());
+        List<ServiceConfigAddDTO> config = json.getConfig();
+        if (null != config && !config.isEmpty()) {
+            JSONObject obj = new JSONObject();
+            for (ServiceConfigAddDTO serviceConfigAddDTO : config) {
+                obj.put(serviceConfigAddDTO.getConfigTemplateId(), serviceConfigAddDTO.getPath());
+            }
+            serviceRequest.setConfig(toJSONString(obj));
+        }
+        List<ServiceCephFileAddDTO> storageFile = json.getStorageFile();
+        if (null != storageFile && !storageFile.isEmpty()) {
+            JSONObject obj = new JSONObject();
+            for (ServiceCephFileAddDTO file : storageFile) {
+                obj.put(file.getCephFileId(), file.getMountPath());
+            }
+            serviceRequest.setStorageFile(toJSONString(obj));
+        }
+        List<ServiceLocalAddDTO> storageLocal = json.getStorageLocal();
+        if (null != storageLocal && !storageLocal.isEmpty()) {
+            JSONObject obj = new JSONObject();
+            for (ServiceLocalAddDTO local : storageLocal) {
+                obj.put(local.getHostPath(), local.getMountPath());
+            }
+            serviceRequest.setStorageLocal(toJSONString(obj));
+        }
+        List<ServiceCephRbdAddDTO> storageRbd = json.getStorageRbd();
+        if (null != storageRbd && !storageRbd.isEmpty()) {
+            JSONObject obj = new JSONObject();
+            for (ServiceCephRbdAddDTO rbd : storageRbd) {
+                obj.put(rbd.getCephRbdId(), rbd.getMountPath());
+            }
+            serviceRequest.setStorageRbd(toJSONString(obj));
+        }
+        if (null != json.getGpu()) {
+            serviceRequest.setGpu(json.getGpu());
+        }
         if (null != json.getHostAliases()) {
             serviceRequest.setHostAliases(toJSONString(json.getHostAliases()));
         }
@@ -408,5 +446,47 @@ public class ServiceCreateController {
             serviceRequest.setInitContainer(toJSONString(json.getInitContainer()));
         }
         return serviceRequest;
+    }
+
+    private void generateHealthCheck(List<ServiceHealthUpdateDTO> healthCheckDTO, ServiceRequest serviceRequest) {
+
+        if (null != healthCheckDTO && !healthCheckDTO.isEmpty()) {
+            List<ServiceHealth> serviceHealths = new ArrayList<ServiceHealth>();
+            for (ServiceHealthUpdateDTO serviceHealthUpdateDTO : healthCheckDTO) {
+                String id = serviceHealthUpdateDTO.getId();
+                int exec = serviceHealthUpdateDTO.getExec() == null ? 0 : 1;
+                int http = serviceHealthUpdateDTO.getHttp() == null ? 0 : 1;
+                int tcp = serviceHealthUpdateDTO.getTcp() == null ? 0 : 1;
+                if (exec + http + tcp != 1) {
+                    throw new ErrorMessageException(ReturnCode.CODE_OPT_SERVICE_NOT_ALLOWED_FAILED,
+                            "exec、http、tcp只能选择其一");
+                }
+                ServiceHealth serviceHealth = new ServiceHealth();
+                if (StringUtils.isNotEmpty(id)) {
+                    serviceHealth.setId(id);
+                }
+                serviceHealth.setExec(serviceHealthUpdateDTO.getExec());
+                serviceHealth.setInitialDelay(serviceHealthUpdateDTO.getInitialDelay());
+                serviceHealth.setPeriodDetction(serviceHealthUpdateDTO.getPeriodDetction());
+                serviceHealth.setProbeType(serviceHealthUpdateDTO.getProbe().byteValue());
+                serviceHealth.setSuccessThreshold(serviceHealthUpdateDTO.getSuccessThreshold().byteValue());
+                if (serviceHealthUpdateDTO.getTcp() != null) {
+                    serviceHealth.setTcp(JSONObject.toJSONString(serviceHealthUpdateDTO.getTcp()));
+                }
+                if (serviceHealthUpdateDTO.getHttp() != null) {
+                    HttpData httpData = new HttpData();
+                    httpData.setHttpHeade(serviceHealthUpdateDTO.getHttp().getHttpHeade());
+                    httpData.setPath(serviceHealthUpdateDTO.getHttp().getPath());
+                    httpData.setPort(serviceHealthUpdateDTO.getHttp().getPort());
+                    serviceHealth.setHttpData(JSONObject.toJSONString(httpData));
+                }
+                serviceHealth.setTimeoutDetction(serviceHealthUpdateDTO.getTimeoutDetction());
+                serviceHealth.setIsTurnOn(serviceHealthUpdateDTO.getIsTurnOn());
+
+                serviceHealths.add(serviceHealth);
+            }
+
+            serviceRequest.setHealthCheck(serviceHealths);
+        }
     }
 }

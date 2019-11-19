@@ -7,18 +7,15 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
- * @ClassName: ServiceCephfsUpdateDTO
- * @Description: 修改ceph文件存储模版
+ * @ClassName: ServiceCephFileAddDTO
+ * @Description: 新增ceph文件存储模版
  * @author zyh
  * @date 2019年10月26日
  *
  */
 @Data
-@ApiModel(value = "修改ceph文件存储模版")
-public class ServiceCephfsUpdateDTO {
-
-    @ApiModelProperty(value = "service和文件存储关联ID", required = true, example = "id", dataType = "String")
-    private String id;
+@ApiModel(value = "新增ceph文件存储模版")
+public class ServiceCephFileAddDTO {
 
     @ApiModelProperty(value = "关联存储卷id", required = true, example = "cephFileId", dataType = "String")
     @NotBlank(message = "关联存储卷id不能为空")

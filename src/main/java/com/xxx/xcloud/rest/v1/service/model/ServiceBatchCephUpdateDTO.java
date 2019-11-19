@@ -18,6 +18,6 @@ import lombok.Data;
 public class ServiceBatchCephUpdateDTO {
 
     @ApiModelProperty(value = "修改后存储卷", required = true, dataType = "List<ServiceAndCephFileDTO>")
-    private List<ServiceAndCephFileDTO> mountCephs;
+    private List<ServiceCephFileUpdateDTO> mountCephs;
 
 }

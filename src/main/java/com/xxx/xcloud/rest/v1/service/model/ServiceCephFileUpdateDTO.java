@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
- * @ClassName: ServiceCephfsUpdateDTO
+ * @ClassName: ServiceCephFileUpdateDTO
  * @Description: 修改ceph文件存储模版
  * @author zyh
  * @date 2019年10月26日
@@ -15,7 +15,7 @@ import lombok.Data;
  */
 @Data
 @ApiModel(value = "修改ceph文件存储模版")
-public class ServiceAndCephFileDTO {
+public class ServiceCephFileUpdateDTO {
 
     @ApiModelProperty(value = "service和文件存储关联ID", required = true, example = "id", dataType = "String")
     private String id;

@@ -39,11 +39,10 @@ import com.xxx.xcloud.module.ceph.entity.ServiceCephRbd;
 import com.xxx.xcloud.module.configmap.entity.ServiceConfig;
 import com.xxx.xcloud.rest.v1.service.model.AffinityUpdateDTO;
 import com.xxx.xcloud.rest.v1.service.model.EnvUpdateDTO;
-import com.xxx.xcloud.rest.v1.service.model.ServiceAndCephFileDTO;
 import com.xxx.xcloud.rest.v1.service.model.ServiceBatchCephUpdateDTO;
 import com.xxx.xcloud.rest.v1.service.model.ServiceBatchConfigUpdateDTO;
+import com.xxx.xcloud.rest.v1.service.model.ServiceCephFileUpdateDTO;
 import com.xxx.xcloud.rest.v1.service.model.ServiceCephRbdUpdateDTO;
-import com.xxx.xcloud.rest.v1.service.model.ServiceCephfsUpdateDTO;
 import com.xxx.xcloud.rest.v1.service.model.ServiceConfigUpdateDTO;
 import com.xxx.xcloud.rest.v1.service.model.ServiceContainerLifecycleDTO;
 import com.xxx.xcloud.rest.v1.service.model.ServiceHealthUpdateDTO;
@@ -246,7 +245,7 @@ public class ServiceConfigController {
             @Valid @RequestBody ServiceBatchCephUpdateDTO json) {
 
         // 解析最新的配置文件信息
-        List<ServiceAndCephFileDTO> newMounts = json.getMountCephs();
+        List<ServiceCephFileUpdateDTO> newMounts = json.getMountCephs();
         LOG.info("mountList----" + newMounts);
         // 删除原有配置文件信息
         List<ServiceAndCephFile> mountList = appConfigService.getServiceCephFile(serviceId);
@@ -261,7 +260,7 @@ public class ServiceConfigController {
         if (null != newMounts && !newMounts.isEmpty()) {
             int size = newMounts.size();
             int flag = 0;
-            for (ServiceAndCephFileDTO mountCephDTO : newMounts) {
+            for (ServiceCephFileUpdateDTO mountCephDTO : newMounts) {
                 ServiceAndCephFile mountCeph = new ServiceAndCephFile();
                 mountCeph.setServiceId(serviceId);
                 mountCeph.setId(mountCephDTO.getId());
@@ -318,7 +317,7 @@ public class ServiceConfigController {
     @ApiOperation(value = "修改服务存储卷", notes = "")
     @ApiImplicitParam(paramType = "path", name = "serviceId", value = "服务ID", required = true, dataType = "String")
     public ApiResult updateServiceCephfs(@PathVariable("serviceId") String serviceId,
-            @Valid @RequestBody ServiceCephfsUpdateDTO json) {
+            @Valid @RequestBody ServiceCephFileUpdateDTO json) {
 
         ServiceAndCephFile serviceCephFile = new ServiceAndCephFile();
         serviceCephFile.setCephFileId(json.getCephFileId());
