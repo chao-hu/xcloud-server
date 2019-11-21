@@ -28,7 +28,6 @@ import com.xxx.xcloud.utils.StringUtils;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.codec.language.bm.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +60,8 @@ public class ImageBuildController {
     private static final String HOOK_OPERATION_PUSH = "push";
     private static final String HOOK_OPERATION_TAG_PUSH = "tag_push";
     private static final Logger LOG = LoggerFactory.getLogger(ImageBuildController.class);
+
+    static final int DEFAULT_LOG_ROW_NUM = 30000;
 
     @Autowired
     private ICiService ciServiceImpl;
@@ -168,7 +169,8 @@ public class ImageBuildController {
                 ciFileInfo.setFileName(ciModel.getPackageName());
                 ci = ciServiceImpl.addCodeCi(ciInfo, codeInfo, ciFileInfo);
 
-            } else if (CiConstant.TYPE_DOCKERFILE == ciType) {// dockerfile 构建
+            } else if (CiConstant.TYPE_DOCKERFILE == ciType) {
+                // dockerfile 构建
                 Ci ciInfo = new Ci(ciName, tenantName, imageName, imageVersion, imageVersionPre,
                         ciModel.getEnvVariables(), ciDescription, null, null, CiConstant.CONSTRUCTION_STATUS_WAIT,
                         new Date(), CiConstant.TYPE_DOCKERFILE, cron, cronDescription, null, null, null, createdBy,
@@ -235,7 +237,8 @@ public class ImageBuildController {
             return apiResult;
         }
 
-        if (ciType == CiConstant.TYPE_CODE) {// 1 代码构建
+        // 1 代码构建
+        if (ciType == CiConstant.TYPE_CODE) {
 
             if (null == ciCodeCredentialsId) {
                 return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NULL, "认证方式不能为空！");
@@ -266,8 +269,8 @@ public class ImageBuildController {
                 return apiResult;
             }
 
-        } else if (ciType == CiConstant.TYPE_DOCKERFILE) {// 2 DockerFile构建
-
+        } else if (ciType == CiConstant.TYPE_DOCKERFILE) {
+            // 2 DockerFile构建
             if (StringUtils.isEmpty(filePath)) {
                 return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NULL, "dockerfile构建上传文件的位置不能为空！");
             }
@@ -400,13 +403,13 @@ public class ImageBuildController {
         String operator = ciModel.getOperator();
 
         // 调用service方法
-        if (CiConstant.CI_OPERATOR_START.equals(operator)) {// start
+        if (CiConstant.CI_OPERATOR_START.equals(operator)) {
             apiResult = startCi(ciId, ciModel.getCreatedBy());
 
-        } else if (CiConstant.CI_OPERATOR_STOP.equals(operator)) {// stop
+        } else if (CiConstant.CI_OPERATOR_STOP.equals(operator)) {
             apiResult = stopCi(ciId);
 
-        } else if (CiConstant.CI_OPERATOR_MODIFY.equals(operator)) {// modify
+        } else if (CiConstant.CI_OPERATOR_MODIFY.equals(operator)) {
             apiResult = modifyCi(ciId, ciModel);
 
         } else if (CiConstant.CI_OPERATOR_DISABLE.equals(operator)) {
@@ -510,8 +513,10 @@ public class ImageBuildController {
         String envVariables = ciModel.getEnvVariables();
         String imageVersionGenerationStrategy = ciModel.getImageVersionGenerationStrategy();
 
-        String reposName = ciModel.getReposName();// git项目名称
-        Integer reposId = ciModel.getReposId();// git项目Id
+        // git项目名称
+        String reposName = ciModel.getReposName();
+        // git项目Id
+        Integer reposId = ciModel.getReposId();
 
         // 文件
         String filePath = ciModel.getFilePath();
@@ -588,7 +593,8 @@ public class ImageBuildController {
 
         ApiResult apiResult = null;
 
-        if (ciType == CiConstant.TYPE_CODE) {// 1 代码构建
+        // 1 代码构建
+        if (ciType == CiConstant.TYPE_CODE) {
 
             if (codeControlType == CiConstant.CODE_TYPE_GITHUB || codeControlType == CiConstant.CODE_TYPE_GITLAB) {
                 if (StringUtils.isEmpty(codeBranch)) {
@@ -604,10 +610,9 @@ public class ImageBuildController {
             if (StringUtils.isEmpty(codeUrl)) {
                 return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NULL, "代码地址不能为空！");
             }
-            // if (StringUtils.isEmpty(dockerfilePath)) {
-            // return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NULL,
-            // "dockerfile路径不能为空！");
-            // }
+            if (StringUtils.isEmpty(dockerfilePath)) {
+                return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NULL, "dockerfile路径不能为空！");
+            }
             if (StringUtils.isEmpty(compile)) {
                 return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NULL, "编译命令不能为空！");
             }
@@ -624,10 +629,10 @@ public class ImageBuildController {
             if (StringUtils.isEmpty(fileName)) {
                 return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NULL, "资源名(dockerfile构建上传文件的名字, 多个文件逗号分隔)不能为空！");
             }
-            // apiResult = checkCiDockerfileFilePathInfo(filePath);
-            // if (apiResult != null) {
-            // return apiResult;
-            // }
+            apiResult = checkCiDockerfileFilePathInfo(filePath);
+            if (apiResult != null) {
+                return apiResult;
+            }
 
         } else {
             return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NULL, "代码构建类型有误，1：代码构建|2：DockerFile构建！");
@@ -725,11 +730,16 @@ public class ImageBuildController {
     }
 
     private ApiResult checkGetCiListParams(String tenantName, Byte ciType) {
+
+        Object a = new ArrayList<>();
+
         Tenant tenant = tenantService.findTenantByTenantName(tenantName);
         if (null == tenant) {
             return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NOT_EXIST, "当前租户不存在！");
         }
-        if (null != ciType && !(ciType == CiConstant.TYPE_CODE || ciType == CiConstant.TYPE_DOCKERFILE)) {
+
+        boolean flag = (ciType == CiConstant.TYPE_CODE || ciType == CiConstant.TYPE_DOCKERFILE);
+        if (null != ciType && !flag) {
             return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NOT_FORMAT, "构建类型不符合规范， 1：代码构建，2：DockerFile构建！");
         }
         return null;
@@ -814,7 +824,7 @@ public class ImageBuildController {
         try {
             Page<CiRecord> ciRecords = ciServiceImpl.getCiRecords(ciId, PageUtil.getPageable(page, size));
             // 截取日志
-            if (logRowNum < 30000) {
+            if (logRowNum < DEFAULT_LOG_ROW_NUM) {
                 // 截取
                 List<CiRecord> ciRecordsIntercept = ciRecords.getContent();
                 for (CiRecord ciRecord : ciRecordsIntercept) {
@@ -1074,7 +1084,6 @@ public class ImageBuildController {
 
             for (DockerfileTemplate template : templates.getContent()) {
                 String dockerfileContent = buildDockerfileContent(template.getDockerfileContent());
-                // template.setDockerfileContent(dockerfileContent);
                 String dockerfileContentNew = SafeCode.encode(dockerfileContent);
                 template.setDockerfileContent(dockerfileContentNew);
             }
@@ -1241,14 +1250,15 @@ public class ImageBuildController {
             return apiResult;
         }
 
-        if (codeControlType == CiConstant.CODE_TYPE_GITHUB) {// github
+        // github
+        if (codeControlType == CiConstant.CODE_TYPE_GITHUB) {
             if (StringUtils.isEmpty(userName)) {
                 return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NULL, "认证用户不能为空！");
             }
             if (StringUtils.isEmpty(accessToken)) {
                 return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NULL, "token不能为空！");
             }
-        } else if (codeControlType == CiConstant.CODE_TYPE_GITLAB) {// svn、gitlab
+        } else if (codeControlType == CiConstant.CODE_TYPE_GITLAB) {
             if (StringUtils.isEmpty(userName)) {
                 return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NULL, "认证用户不能为空！");
             }
@@ -1263,8 +1273,9 @@ public class ImageBuildController {
             if (StringUtils.isEmpty(registoryAddress)) {
                 return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NULL, "仓库地址不能为空！");
             }
-            if (codeControlType == CiConstant.CODE_TYPE_SVN && !(publicOrPrivateFlag == 0
-                    || publicOrPrivateFlag == 1)) {
+
+            boolean flag = (publicOrPrivateFlag == 0 || publicOrPrivateFlag == 1);
+            if (codeControlType == CiConstant.CODE_TYPE_SVN && !flag) {
                 return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NULL, "是否公有不能为空！");
             }
             if (publicOrPrivateFlag == 1) {
@@ -1513,7 +1524,8 @@ public class ImageBuildController {
         List<Ci> ciList = ciServiceImpl.getAllCi();
 
         // check object_kind push / tag_push
-        if (objectKind.equals(HOOK_OPERATION_PUSH)) {// push events
+        // push events
+        if (objectKind.equals(HOOK_OPERATION_PUSH)) {
             String branch = ref.substring(ref.lastIndexOf("/") + 1);
 
             for (Ci ci : ciList) {
@@ -1530,7 +1542,8 @@ public class ImageBuildController {
                     }
                 }
             }
-        } else if (objectKind.equals(HOOK_OPERATION_TAG_PUSH)) {// tag events
+        } else if (objectKind.equals(HOOK_OPERATION_TAG_PUSH)) {
+            // tag events
             String tag = ref.substring(ref.lastIndexOf("/") + 1);
 
             for (Ci ci : ciList) {

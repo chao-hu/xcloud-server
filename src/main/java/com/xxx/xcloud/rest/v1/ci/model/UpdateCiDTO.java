@@ -1,8 +1,8 @@
 package com.xxx.xcloud.rest.v1.ci.model;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import com.xxx.xcloud.module.validator.constraint.*;
+import io.swagger.annotations.*;
+import lombok.*;
 
 /**
  * 创建构建任务参数
@@ -40,7 +40,7 @@ public class UpdateCiDTO {
     @ApiModelProperty(value = "镜像版本生成策略", required = true, example = "1,2", dataType = "String")
     private String imageVersionGenerationStrategy;
 
-    //todo @Env
+    @Env
     @ApiModelProperty(value = "环境变量", required = false, example = "", dataType = "String")
     private String envVariables;
 

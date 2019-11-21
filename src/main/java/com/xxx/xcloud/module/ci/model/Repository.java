@@ -1,5 +1,8 @@
 package com.xxx.xcloud.module.ci.model;
 
+/**
+ * @author xjp
+ */
 public class Repository {
 
     private String name;

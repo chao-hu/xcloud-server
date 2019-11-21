@@ -615,4 +615,8 @@ public class Global {
      */
     public static final String MOUNTCEPHFILE_SERVICE = "service";
     public static final String MOUNTCEPHFILE_CONFIGBUS = "springcloud-configbus";
+
+
+    public static final String DEVOPS_GLOBAL_CONFIGURE_NODEJS = "DEVOPS_GLOBAL_CONFIGURE_NODEJS";
+    public static final String DEVOPS_GLOBAL_CONFIGURE_PYTHON = "DEVOPS_GLOBAL_CONFIGURE_PYTHON";
 }

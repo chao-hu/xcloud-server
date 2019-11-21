@@ -1,45 +1,35 @@
 package com.xxx.xcloud.module.ci.service;
 
-import com.xxx.xcloud.module.ci.entity.Ci;
-import com.xxx.xcloud.module.ci.entity.CiFile;
-import com.xxx.xcloud.module.ci.entity.CiRecord;
-import com.xxx.xcloud.module.ci.entity.CodeInfo;
-import com.xxx.xcloud.module.ci.model.CiDetail;
-import com.xxx.xcloud.module.image.model.ImageDetail;
-import org.apache.commons.codec.language.bm.Lang;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.xxx.xcloud.module.ci.entity.*;
+import com.xxx.xcloud.module.ci.model.*;
+import com.xxx.xcloud.module.image.model.*;
+import org.springframework.data.domain.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author xujiangpeng
  * @ClassName:
  * @Description: 镜像构建接口
  * @date
- * @todo ImageBuildService\sourceBuild\packageBuild
+ *
  */
 public interface ICiService {
 
     /**
      * 新增构建任务(基于源代码)
-     *
      * @param ci
-     * @throws
-     * @Title: addSourceBuild
-     * @Description:
+     * @param codeInfo
+     * @param ciFile
+     * @return
      */
     Ci addCodeCi(Ci ci, CodeInfo codeInfo, CiFile ciFile);
 
     /**
      * 新增构建任务(基于部署包)
-     *
      * @param ci
-     * @throws
-     * @Title: addSourceBuild
-     * @Description:
+     * @param ciFile
+     * @return
      */
     Ci addDockerfileCi(Ci ci, CiFile ciFile);
 

@@ -1,56 +1,43 @@
 package com.xxx.xcloud.module.ci.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
-import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.command.InspectImageResponse;
-import com.offbytwo.jenkins.model.Build;
-import com.offbytwo.jenkins.model.BuildResult;
-import com.xxx.xcloud.client.docker.DockerClientFactory;
-import com.xxx.xcloud.common.Global;
-import com.xxx.xcloud.common.ReturnCode;
-import com.xxx.xcloud.common.XcloudProperties;
-import com.xxx.xcloud.common.exception.ErrorMessageException;
-import com.xxx.xcloud.module.ci.consts.CiConstant;
+import com.alibaba.fastjson.*;
+import com.github.dockerjava.api.*;
+import com.github.dockerjava.api.command.*;
+import com.offbytwo.jenkins.model.*;
+import com.xxx.xcloud.client.docker.*;
+import com.xxx.xcloud.common.*;
+import com.xxx.xcloud.common.exception.*;
+import com.xxx.xcloud.module.ci.consts.*;
 import com.xxx.xcloud.module.ci.entity.*;
-import com.xxx.xcloud.module.ci.model.CiDetail;
-import com.xxx.xcloud.module.ci.repository.CiFileRepository;
-import com.xxx.xcloud.module.ci.repository.CiRecordRepository;
-import com.xxx.xcloud.module.ci.repository.CiRepository;
-import com.xxx.xcloud.module.ci.service.CiCodeCredentialsService;
-import com.xxx.xcloud.module.ci.service.ICiService;
-import com.xxx.xcloud.module.ci.strategy.jenkins.AbstractCiStrategyJenkins;
-import com.xxx.xcloud.module.ci.strategy.jenkins.CiStrategyFactoryJenkins;
-import com.xxx.xcloud.module.ci.threadpool.CiThreadPool;
-import com.xxx.xcloud.module.devops.common.DevopsException;
-import com.xxx.xcloud.module.devops.job.service.JobService;
+import com.xxx.xcloud.module.ci.model.*;
+import com.xxx.xcloud.module.ci.repository.*;
+import com.xxx.xcloud.module.ci.service.*;
+import com.xxx.xcloud.module.ci.strategy.jenkins.*;
+import com.xxx.xcloud.module.ci.threadpool.*;
+import com.xxx.xcloud.module.devops.common.*;
+import com.xxx.xcloud.module.devops.job.service.*;
 import com.xxx.xcloud.module.devops.model.Job;
-import com.xxx.xcloud.module.docker.DockerService;
-import com.xxx.xcloud.module.harbor.entity.HarborUser;
-import com.xxx.xcloud.module.image.consts.ImageConstant;
-import com.xxx.xcloud.module.image.entity.Image;
-import com.xxx.xcloud.module.image.entity.ImageVersion;
-import com.xxx.xcloud.module.image.model.ImageDetail;
-import com.xxx.xcloud.module.image.service.ImageService;
-import com.xxx.xcloud.module.quartz.CodeCiJob;
-import com.xxx.xcloud.module.quartz.QuartzUtils;
+import com.xxx.xcloud.module.docker.*;
+import com.xxx.xcloud.module.harbor.entity.*;
+import com.xxx.xcloud.module.image.consts.*;
+import com.xxx.xcloud.module.image.entity.*;
+import com.xxx.xcloud.module.image.model.*;
+import com.xxx.xcloud.module.image.service.*;
+import com.xxx.xcloud.module.quartz.*;
 import com.xxx.xcloud.utils.*;
-import org.apache.commons.codec.language.bm.Lang;
-import org.apache.commons.net.ftp.FTPClient;
-import org.quartz.SchedulerException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.apache.commons.net.ftp.*;
+import org.quartz.*;
+import org.slf4j.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.context.*;
+import org.springframework.data.domain.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.io.*;
+import java.text.*;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 /**
  * @author mengaijun
@@ -77,8 +64,8 @@ public class ICiServiceImpl implements ICiService {
     @Autowired
     private DockerService dockerService;
 
-    //    @Autowired todo
-    //    private ApplicationContext applicationContext;
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Autowired
     private CiCodeCredentialsService ciCodeCredentialsService;
@@ -326,28 +313,27 @@ public class ICiServiceImpl implements ICiService {
 
     @Override
     public List<Lang> getLangsByType(String langType) {
-        //        String config = null;
-        //        if (CiConstant.DEVOPS_LANG_JAVA.equals(langType)) {
-        //            config = XcloudProperties.getConfigMap().get(Global.DEVOPS_GLOBAL_CONFIGURE_JDK);
-        //        } else if (CiConstant.DEVOPS_LANG_GO.equals(langType)) {
-        //            config = XcloudProperties.getConfigMap().get(Global.DEVOPS_GLOBAL_CONFIGURE_GO);
-        //        } else if (CiConstant.DEVOPS_LANG_NODEJS.equals(langType)) {
-        //            config = XcloudProperties.getConfigMap().get(Global.DEVOPS_GLOBAL_CONFIGURE_NODEJS);
-        //        } else if (CiConstant.DEVOPS_LANG_PYTHON.equals(langType)) {
-        //            config = XcloudProperties.getConfigMap().get(Global.DEVOPS_GLOBAL_CONFIGURE_PYTHON);
-        //        } else {
-        //            config = XcloudProperties.getConfigMap().get(Global.DEVOPS_GLOBAL_CONFIGURE_GO);
-        //        }
-        //
-        //        String[] configArr = config.split(",");
-        //        List<Lang> langs = new ArrayList<>(configArr.length);
-        //        for (String c : configArr) {
-        //            Lang lang = new Lang();
-        //            lang.setVersion(c.trim());
-        //            langs.add(lang);
-        //        }
-        //        return langs;
-        return null;
+        String config = null;
+        if (CiConstant.DEVOPS_LANG_JAVA.equals(langType)) {
+            config = XcloudProperties.getConfigMap().get(Global.DEVOPS_GLOBAL_CONFIGURE_JDK);
+        } else if (CiConstant.DEVOPS_LANG_GO.equals(langType)) {
+            config = XcloudProperties.getConfigMap().get(Global.DEVOPS_GLOBAL_CONFIGURE_GO);
+        } else if (CiConstant.DEVOPS_LANG_NODEJS.equals(langType)) {
+            config = XcloudProperties.getConfigMap().get(Global.DEVOPS_GLOBAL_CONFIGURE_NODEJS);
+        } else if (CiConstant.DEVOPS_LANG_PYTHON.equals(langType)) {
+            config = XcloudProperties.getConfigMap().get(Global.DEVOPS_GLOBAL_CONFIGURE_PYTHON);
+        } else {
+            config = XcloudProperties.getConfigMap().get(Global.DEVOPS_GLOBAL_CONFIGURE_GO);
+        }
+
+        String[] configArr = config.split(",");
+        List<Lang> langs = new ArrayList<>(configArr.length);
+        for (String c : configArr) {
+            Lang lang = new Lang();
+            lang.setVersion(c.trim());
+            langs.add(lang);
+        }
+        return langs;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -914,9 +900,9 @@ public class ICiServiceImpl implements ICiService {
         ciRecord.setConstructionDuration(constructionDuration);
         // 更新构建状态
         try {
-            //todo
-            //            applicationContext.getBean(ICiService.class)
-            //                    .updateCiInfoTransactional(ci, null, null, ciRecord, imageDetail);
+
+            applicationContext.getBean(ICiService.class)
+                    .updateCiInfoTransactional(ci, null, null, ciRecord, imageDetail);
         } catch (Exception e) {
             LOG.error("构建完成后, 更新数据库构建状态失败! " + e.getMessage(), e);
             throw new ErrorMessageException(ReturnCode.CODE_SQL_SAVE_INFO_FAILED, "构建完成后, 更新数据库构建状态失败!");
@@ -1252,8 +1238,6 @@ public class ICiServiceImpl implements ICiService {
             String ciInterruptFlagName = generateDockerfileCiInterruptFlag(ci);
             dockerfileCiInInterruptFlagMap.put(ciInterruptFlagName, "");
         } else { // 代码构建, 调用停止接口
-            // stopSheraJob(ci.getTenantName(), ci.getCiName(),
-            // ciRecord.getSheraConstructionId());
             stopJenkinsJob(ci.getTenantName(), ci.getCiName(), JobService.JOB_TYPE_DOCKER,
                     ciRecord.getSheraConstructionId());
         }
@@ -1634,14 +1618,10 @@ public class ICiServiceImpl implements ICiService {
         }
         String ftpFilePath = ciFile.getFilePath();
         LOG.info("----------ftpFilePath------------" + ftpFilePath);
-        // FtpFilePath ftpFile = JSONObject.parseObject(filePath,
-        // FtpFilePath.class);
-        // LOG.info("----------ciFile------------" +
-        // JSONObject.toJSONString(ftpFile));
         if (null == ftpFilePath) {
             return true;
         }
-        // String ftpFilePath = filePath.getFilePath();
+
         if (!StringUtils.isEmpty(ftpFilePath)) {
             // 删除FTP上的文件
             FTPClient ftpClient = null;
@@ -1662,17 +1642,6 @@ public class ICiServiceImpl implements ICiService {
         deleteCiFileByCiId(ciId);
         deleteCiRecordsByCiId(ciId);
 
-        // 删除上传文件信息(删除数据库信息成功, 就当成删除成功)
-        // if (ciFile != null) {
-        // String filePath = ciFile.getFilePath();
-        // try {
-        // FtpUtils.removeDirAndSubFile(FTP_HOST, FTP_USER_NAME, FTP_PASSWORD,
-        // FTP_PORT,
-        // filePath, ciFile.getFileName().split(","));
-        // } catch (Exception e) {
-        // LOG.error("删除dockerfile构件记录时, 删除上传文件失败! " + e.getMessage(), e);
-        // }
-        // }
         return true;
     }
 
@@ -1882,28 +1851,6 @@ public class ICiServiceImpl implements ICiService {
         }
 
         ciDetail.setCiRecords(ciRecords);
-        // // 添加统计信息
-        // // 总构建时长
-        // int constructionDurationTotal = 0;
-        // // 构建成功次数
-        // int constructionOkTotal = 0;
-        // // 构建失败次数
-        // int constructionFailTotal = 0;
-        // for (CiRecord ciRecord : ciRecords) {
-        // if (ciRecord.getConstructionResult() ==
-        // CiConstant.CONSTRUCTION_STATUS_SUCCESS) {
-        // constructionOkTotal++;
-        // } else if (ciRecord.getConstructionResult() ==
-        // CiConstant.CONSTRUCTION_STATUS_FAIL) {
-        // constructionFailTotal++;
-        // }
-        // if (ciRecord.getConstructionDuration() != null) {
-        // constructionDurationTotal += ciRecord.getConstructionDuration();
-        // }
-        // }
-        // ciDetail.setConstructionDurationTotal(constructionDurationTotal);
-        // ciDetail.setConstructionOkTotal(constructionOkTotal);
-        // ciDetail.setConstructionFailTotal(constructionFailTotal);
 
         return ciDetail;
     }

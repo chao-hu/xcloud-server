@@ -619,19 +619,18 @@ public class CiCodeCredentialsServiceImpl implements CiCodeCredentialsService {
      * @date: 2019年3月6日 下午2:09:54
      */
     private List<GitlabRepos> getGitlabReposByToken(CiCodeCredentials ciCodeCredentials, String token) {
-//        setGitlabApiVersoinInfo(ciCodeCredentials, token);
-//        List<GitlabRepos> projects = null;
-//        try {
-//            int curPage = 1;
-//            JSONArray jsonArr = getGitlabApi(ciCodeCredentials).getProkectsByToken(token, Integer.MAX_VALUE, curPage);
-//            projects = jsonArr.toJavaList(GitlabRepos.class);
-//        } catch (GitlabException e) {
-//            LOG.error("调用接口异常" + e.getCode() + " " + e.getMessage(), e);
-//        } catch (Exception e) {
-//            LOG.error("获取用户下的项目失败!", e);
-//        }
-//        return projects;
-        return  null;
+        setGitlabApiVersoinInfo(ciCodeCredentials, token);
+        List<GitlabRepos> projects = null;
+        try {
+            int curPage = 1;
+            JSONArray jsonArr = getGitlabApi(ciCodeCredentials).getProjectsByToken(token, Integer.MAX_VALUE, curPage);
+            projects = jsonArr.toJavaList(GitlabRepos.class);
+        } catch (GitlabException e) {
+            LOG.error("调用接口异常" + e.getCode() + " " + e.getMessage(), e);
+        } catch (Exception e) {
+            LOG.error("获取用户下的项目失败!", e);
+        }
+        return projects;
     }
 
     /**
