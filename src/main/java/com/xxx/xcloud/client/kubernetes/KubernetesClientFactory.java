@@ -21,6 +21,7 @@ import io.fabric8.kubernetes.client.KubernetesClientException;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.kubernetes.client.dsl.ScalableResource;
+import io.fabric8.kubernetes.client.dsl.internal.CustomResourceOperationContext;
 import io.fabric8.kubernetes.client.dsl.internal.CustomResourceOperationsImpl;
 
 /**
@@ -76,11 +77,21 @@ public class KubernetesClientFactory {
         /**
          * cascading delete default is false
          */
+        @SuppressWarnings("rawtypes")
         @Override
         public <T extends HasMetadata, L extends KubernetesResourceList, D extends Doneable<T>> MixedOperation<T, L, D, Resource<T, D>> customResources(
                 CustomResourceDefinition crd, Class<T> resourceType, Class<L> listClass, Class<D> doneClass) {
 
-            return new CustomResourceOperationsImpl<T, L, D>(httpClient, getConfiguration());
+            return new CustomResourceOperationsImpl<T, L, D>(new CustomResourceOperationContext()
+                    .withOkhttpClient(httpClient).withConfig(getConfiguration()).withCrd(crd)
+                    .withApiGroupName(crd.getSpec().getGroup()).withApiGroupVersion(crd.getSpec().getVersion())
+                    .withPlural(crd.getSpec().getNames().getPlural()).withCascading(true).withReloadingFromServer(false)
+                    .withType(resourceType).withListType(listClass).withDoneableType(doneClass));
+            // return new CustomResourceOperationsImpl<T, L, D>(httpClient,
+            // getConfiguration(), crd.getSpec().getGroup(),
+            // crd.getSpec().getVersion(), crd.getSpec().getNames().getPlural(),
+            // null, null, true, null, null,
+            // false, resourceType, listClass, doneClass);
         }
 
         public XcloudKubernetesClient(Config config) throws KubernetesClientException {

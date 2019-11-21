@@ -1,15 +1,16 @@
-package com.xxx.xcloud.common;
+package com.xxx.xcloud.module.component.consts;
 
 /**
- * 组件公有的常量
+ * @ClassName: CommonConst
+ * @Description: 组件公共常量
+ * @author lnn
+ * @date 2019年11月15日
  *
- * @author LiuYue
- * @date 2018年12月12日
  */
 public class CommonConst {
 
     /**
-     * APPTYPE
+     * @Fields: APPTYPE
      */
     public static final String APPTYPE_MYSQL = "mysql";
     public static final String APPTYPE_ES = "es";
@@ -25,7 +26,7 @@ public class CommonConst {
     public static final String APPTYPE_YARN = "yarn";
 
     /**
-     *  集群、节点状态
+     * 集群、节点状态
      */
     public final static String STATE_CLUSTER_RUNNING = "Running";
     public final static String STATE_CLUSTER_STOPPED = "Stopped";
@@ -56,13 +57,13 @@ public class CommonConst {
     public final static String STATE_NODE_TERMINATING = "Terminating";
 
     /**
-     *  redis、codis、memcached使用的操作类型
+     * redis、codis、memcached使用的操作类型
      */
     public static final String OPT_CLUSTER_STOP = "Stop";
     public static final String OPT_CLUSTER_START = "Start";
 
     /**
-     *  定义statefulService的latestAction
+     * 定义statefulService的latestAction
      */
     public static final String ACTION_CLUSTER_CREATE = "ClusterCreate";
     public static final String ACTION_CLUSTER_STOP = "ClusterStop";
@@ -79,7 +80,7 @@ public class CommonConst {
     public static final String ACTION_USER_DELETE = "UserDelete";
 
     /**
-     *  字段校验
+     * 字段校验
      */
     public static final String CHECK_CLUSTER_NAME = "^[a-zA-Z][a-zA-Z0-9]{4,14}[a-zA-Z0-9]$";
     public static final String CHECK_USER_PASSSWORD = "^[a-zA-Z0-9]{6,16}$";
@@ -96,9 +97,9 @@ public class CommonConst {
     public static final String CHECK_REDIS_SENTINEL_MEMORY = "^[0-9]\\d*(\\.\\d+)?$";
 
     /**
-     *  资源、角色
+     * 资源、角色
      */
-    public static final String CPU = "cpu";
+    public static final String CPU = "cpu"; 
     public static final String MEMORY = "memory";
 
     public static final String UNIT_GI = "Gi";
@@ -116,7 +117,7 @@ public class CommonConst {
     public static final int SHOW_LEVEL_SENIOR = 2;
 
     /**
-     *  lvm相关
+     * lvm相关
      */
     public static final String LVM_API_VERSION = "bonc.com/v1";
     public static final String LVM_KIND = "LVM";
@@ -124,7 +125,7 @@ public class CommonConst {
     public static final String LVM_SCHEDULER = "lvm-scheduler";
 
     /**
-     *  线程休眠时间、超时时间
+     * 线程休眠时间、超时时间
      */
     public static final int THREAD_SLEEP_TIME = 5000;
     public static final int COMPONENT_OPERATION_TIMEOUT = 300000;
@@ -135,14 +136,14 @@ public class CommonConst {
     public static final Long DAY = HOUR * 24;
 
     /**
-     *  参数显示等级
+     * 参数显示等级
      */
     public static final String LEVEL_ORDINARY = "ordinary";
     public static final String LEVEL_SENIOR = "senior";
     public static final String EXPORTER_STRING = "exporter";
 
     /**
-     * 数字类
+     * @Fields: 数字类
      */
     public static final int NUMBER_ZERO = 0;
     public static final int NUMBER_ONE = 1;
