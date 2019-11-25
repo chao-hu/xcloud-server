@@ -604,7 +604,7 @@ public class CodeCheckController {
             for (int i = 0; i < ruleStatus.size(); i++) {
 
                 sonarService
-                        .modifyRuleActivation(rulesetKey, ruleStatus.get(i).getRuleKey(), ruleStatus.get(i).isActive());
+                        .modifyRuleActivation(rulesetKey, ruleStatus.get(i).getRuleKey(), ruleStatus.get(i).getActive());
             }
             apiResult = new ApiResult(ReturnCode.CODE_SUCCESS, "规则集中规则值状态修改成功！");
 

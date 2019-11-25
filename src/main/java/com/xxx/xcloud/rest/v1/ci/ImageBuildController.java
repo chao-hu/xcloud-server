@@ -738,8 +738,13 @@ public class ImageBuildController {
             return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NOT_EXIST, "当前租户不存在！");
         }
 
+
+        if(null == ciType){
+            return null;
+        }
+
         boolean flag = (ciType == CiConstant.TYPE_CODE || ciType == CiConstant.TYPE_DOCKERFILE);
-        if (null != ciType && !flag) {
+        if (!flag) {
             return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NOT_FORMAT, "构建类型不符合规范， 1：代码构建，2：DockerFile构建！");
         }
         return null;
@@ -1275,7 +1280,7 @@ public class ImageBuildController {
             }
 
             boolean flag = (publicOrPrivateFlag == 0 || publicOrPrivateFlag == 1);
-            if (codeControlType == CiConstant.CODE_TYPE_SVN && !flag) {
+            if (!flag) {
                 return new ApiResult(ReturnCode.CODE_CHECK_PARAM_IS_NULL, "是否公有不能为空！");
             }
             if (publicOrPrivateFlag == 1) {
