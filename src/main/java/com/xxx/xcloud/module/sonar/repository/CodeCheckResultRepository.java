@@ -12,7 +12,6 @@ import java.util.List;
 /**
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年5月20日 上午11:13:47
  */
 @Repository
@@ -39,7 +38,7 @@ public interface CodeCheckResultRepository extends JpaRepository<CodeCheckResult
     Page<CodeCheckResult> getCodeCheckHistoryRecord(String id, Pageable pageable);
 
     /**
-     * 
+     *  未使用
      * @return List<CodeCheckResult>
      * @date: 2019年8月21日 下午3:52:25
      */

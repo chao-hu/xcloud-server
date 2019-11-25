@@ -4,7 +4,6 @@ package com.xxx.xcloud.module.devops.model;
  * phing构建信息
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年4月2日 上午10:36:34
  */
 public class PhingModel {

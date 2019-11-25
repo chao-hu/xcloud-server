@@ -1,54 +1,37 @@
 package com.xxx.xcloud.module.sonar.service.impl;
 
-import com.offbytwo.jenkins.model.Build;
-import com.offbytwo.jenkins.model.BuildResult;
-import com.xxx.xcloud.client.sonar.SonarApi;
-import com.xxx.xcloud.client.sonar.SonarClientFactory;
-import com.xxx.xcloud.client.sonar.exception.SonarException;
+import com.offbytwo.jenkins.model.*;
+import com.xxx.xcloud.client.sonar.*;
+import com.xxx.xcloud.client.sonar.exception.*;
 import com.xxx.xcloud.client.sonar.model.*;
-import com.xxx.xcloud.common.Global;
-import com.xxx.xcloud.common.ReturnCode;
-import com.xxx.xcloud.common.XcloudProperties;
-import com.xxx.xcloud.common.exception.ErrorMessageException;
-import com.xxx.xcloud.module.ci.consts.CiConstant;
-import com.xxx.xcloud.module.ci.entity.CiCodeCredentials;
-import com.xxx.xcloud.module.ci.entity.CodeInfo;
-import com.xxx.xcloud.module.ci.model.SonarRule;
-import com.xxx.xcloud.module.ci.service.CiCodeCredentialsService;
-import com.xxx.xcloud.module.ci.service.ICiService;
-import com.xxx.xcloud.module.ci.strategy.jenkins.AbstractCiStrategyJenkins;
-import com.xxx.xcloud.module.ci.strategy.jenkins.CiStrategyFactoryJenkins;
-import com.xxx.xcloud.module.devops.common.DevopsException;
-import com.xxx.xcloud.module.devops.job.service.JobService;
-import com.xxx.xcloud.module.quartz.CodeCheckJob;
-import com.xxx.xcloud.module.quartz.QuartzUtils;
-import com.xxx.xcloud.module.sonar.CodeCheckConstant;
-import com.xxx.xcloud.module.sonar.entity.CodeCheckInfo;
-import com.xxx.xcloud.module.sonar.entity.CodeCheckResult;
-import com.xxx.xcloud.module.sonar.entity.CodeCheckTask;
-import com.xxx.xcloud.module.sonar.entity.QualityProfile;
+import com.xxx.xcloud.common.*;
+import com.xxx.xcloud.common.exception.*;
+import com.xxx.xcloud.module.ci.consts.*;
+import com.xxx.xcloud.module.ci.entity.*;
+import com.xxx.xcloud.module.ci.model.*;
+import com.xxx.xcloud.module.ci.service.*;
+import com.xxx.xcloud.module.ci.service.impl.*;
+import com.xxx.xcloud.module.ci.strategy.jenkins.*;
+import com.xxx.xcloud.module.ci.threadpool.*;
+import com.xxx.xcloud.module.devops.common.*;
+import com.xxx.xcloud.module.devops.job.service.*;
+import com.xxx.xcloud.module.quartz.*;
+import com.xxx.xcloud.module.sonar.*;
+import com.xxx.xcloud.module.sonar.entity.*;
 import com.xxx.xcloud.module.sonar.model.Component;
-import com.xxx.xcloud.module.sonar.model.Measure;
-import com.xxx.xcloud.module.sonar.model.SonarCheckResultSummary;
-import com.xxx.xcloud.module.sonar.repository.CodeCheckResultRepository;
-import com.xxx.xcloud.module.sonar.repository.CodeCheckTaskRepository;
-import com.xxx.xcloud.module.sonar.repository.QualityProfileRepository;
-import com.xxx.xcloud.module.sonar.service.SonarService;
-import com.xxx.xcloud.utils.DateUtil;
-import com.xxx.xcloud.utils.PageUtil;
-import com.xxx.xcloud.utils.StringUtils;
-import org.quartz.SchedulerException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.xxx.xcloud.module.sonar.model.*;
+import com.xxx.xcloud.module.sonar.repository.*;
+import com.xxx.xcloud.module.sonar.service.*;
+import com.xxx.xcloud.utils.*;
+import org.quartz.*;
+import org.slf4j.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.data.domain.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  *
@@ -588,16 +571,12 @@ public class SonarServiceImpl implements SonarService {
         codeCheckTaskOld.setTaskDesc(codeCheckTask.getTaskDesc());
         codeCheckTaskOld.setLanguage(codeCheckTask.getLanguage());
         codeCheckTaskOld.setSonarRuleJosnStr(codeCheckTask.getSonarRuleJosnStr());
-        // codeCheckTaskOld.setCreatedBy(codeCheckTask.getCreatedBy());
 
         // 保存数据库
         saveCodeCheckTask(codeCheckTaskOld);
 
         // 再更新 job, 更新失败, 保存也回滚
         AbstractCiStrategyJenkins ciStrategyJenkins = CiStrategyFactoryJenkins.getCiStrategy("");
-        // com.xxx.xcloud.module.devops.model.Job job =
-        // ciStrategyJenkins.generateJenkinsJob(null, codeCheckTask, codeInfo,
-        // credentials, generateSonarRule(codeCheckTask), null);
         com.xxx.xcloud.module.devops.model.Job job = ciStrategyJenkins.generateJenkinsSonarJob(codeCheckTask, codeInfo,
                 credentials, generateSonarRule(codeCheckTask));
 
@@ -696,20 +675,19 @@ public class SonarServiceImpl implements SonarService {
         }
         CiCodeCredentials ciCodeCredentials = ciCodeCredentialsService.getById(codeInfo.getCiCodeCredentialsId());
         if (ciCodeCredentials == null) {
-            throw new ErrorMessageException(ReturnCode.CODE_CHECK_PARAM_IS_NOT_EXIST, "启动失败，找不到代码库！");
+            throw new ErrorMessageException(ReturnCode.CODE_CHECK_PARAM_IS_NOT_EXIST, "启动失败，找不到代库！");
         }
 
-        // TODO: 2019/11/11  
-//        String codeBaseName = CiServiceImpl.generateCodeBaseName(ciCodeCredentials, codeInfo,
-//                codeCheckTask.getTenantName());
-//
-//        // 更新状态
-//        codeCheckTask.setStatus(CodeCheckConstant.CODE_CHECK_STATUS_ING);
-//        codeCheckTask.setCheckTime(new Date());
-//        saveCodeCheckTask(codeCheckTask);
-//
-//        // 启动检查线程
-//        CiThreadPool.getExecotur().execute(new StartJenkinsJobThread(codeCheckTask, codeBaseName));
+        String codeBaseName = ICiServiceImpl.generateCodeBaseName(ciCodeCredentials, codeInfo,
+                codeCheckTask.getTenantName());
+
+        // 更新状态
+        codeCheckTask.setStatus(CodeCheckConstant.CODE_CHECK_STATUS_ING);
+        codeCheckTask.setCheckTime(new Date());
+        saveCodeCheckTask(codeCheckTask);
+
+        // 启动检查线程
+        CiThreadPool.getExecotur().execute(new StartJenkinsJobThread(codeCheckTask, codeBaseName));
 
         return true;
     }
@@ -1198,7 +1176,6 @@ public class SonarServiceImpl implements SonarService {
      * 代码检查任务
      *
      * @author mengaijun
-     * @Description: TODO
      * @date: 2019年6月19日 上午10:49:48
      */
     public class StartJenkinsJobThread implements Runnable {

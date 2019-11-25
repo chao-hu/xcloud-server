@@ -4,7 +4,6 @@ package com.xxx.xcloud.client.gitlab.model;
  * 项目分支
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2018年12月21日 下午5:30:34
  */
 public class GitlabBranch {

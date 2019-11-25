@@ -5,7 +5,6 @@ import lombok.*;
 
 /**
  * @ClassName: com.xxx.xcloud.module.sonar.model.SwOperatorRuleset
- * @Description: TODO
  * @author: xjp
  * @date: 2019年5月23日 上午10:19:15
  */
@@ -23,61 +22,5 @@ public class CopyRulesetDTO {
 
     @ApiModelProperty(value = "新规则集名称", required = false, example = "testName", dataType = "String")
     private String newName;
-
-    /**
-     * @return the tenantName
-     */
-    public String getTenantName() {
-        return tenantName;
-    }
-
-    /**
-     * @param tenantName the tenantName to set
-     */
-    public void setTenantName(String tenantName) {
-        this.tenantName = tenantName;
-    }
-
-    /**
-     * @return the rulesetKey
-     */
-    public String getRulesetKey() {
-        return rulesetKey;
-    }
-
-    /**
-     * @param rulesetKey the rulesetKey to set
-     */
-    public void setRulesetKey(String rulesetKey) {
-        this.rulesetKey = rulesetKey;
-    }
-
-    /**
-     * @return the newName
-     */
-    public String getNewName() {
-        return newName;
-    }
-
-    /**
-     * @param newName the newName to set
-     */
-    public void setNewName(String newName) {
-        this.newName = newName;
-    }
-
-    /**
-     * @return the language
-     */
-    public String getLanguage() {
-        return language;
-    }
-
-    /**
-     * @param language the language to set
-     */
-    public void setLanguage(String language) {
-        this.language = language;
-    }
 
 }

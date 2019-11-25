@@ -4,7 +4,6 @@ package com.xxx.xcloud.module.sonar.model;
  * 拼接检查结果类
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年5月9日 下午3:51:47
  */
 public class Measure {

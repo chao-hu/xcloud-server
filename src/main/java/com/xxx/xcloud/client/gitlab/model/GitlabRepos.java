@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * gitlab一个项目
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2018年12月21日 下午3:21:50
  */
 public class GitlabRepos {

@@ -1,18 +1,16 @@
 package com.xxx.xcloud.client.github;
 
-import java.util.List;
-
 import com.alibaba.fastjson.JSONArray;
 import com.xxx.xcloud.client.github.model.GitHubBranch;
 import com.xxx.xcloud.client.github.model.GithubUser;
-
 import feign.Param;
 import feign.RequestLine;
+
+import java.util.List;
 
 /**
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年1月3日 下午6:39:31
  */
 public interface GithubApi {

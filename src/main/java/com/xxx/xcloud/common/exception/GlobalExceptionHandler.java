@@ -1,11 +1,7 @@
 package com.xxx.xcloud.common.exception;
 
-import java.util.List;
-import java.util.Set;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-
+import com.xxx.xcloud.common.ApiResult;
+import com.xxx.xcloud.common.ReturnCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.ObjectError;
@@ -15,14 +11,15 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.xxx.xcloud.common.ApiResult;
-import com.xxx.xcloud.common.ReturnCode;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 全局异常处理类
  *
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年2月28日 下午5:49:07
  */
 @ControllerAdvice

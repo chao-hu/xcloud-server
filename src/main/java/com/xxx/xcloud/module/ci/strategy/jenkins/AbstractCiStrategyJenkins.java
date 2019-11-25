@@ -26,7 +26,6 @@ import java.util.Objects;
  * 代码构建策略
  *
  * @author mengaijun
- * @Description: TODO
  * @date: 2018年12月20日 下午2:41:00
  */
 public abstract class AbstractCiStrategyJenkins {
@@ -245,52 +244,6 @@ public abstract class AbstractCiStrategyJenkins {
         return dockerModel;
     }
 
-    /**
-     * todo:应该是sheRa的遗留
-     */
-    //    /**
-//     * 生成CodeManager信息
-//     *
-//     * @param codeInfo         代码信息
-//     * @param ciCodeCredentials 代码认证信息
-//     * @return CodeManager
-//     * @date: 2018年12月20日 下午3:39:01
-//     */
-//    protected CodeManager codeManager(CodeInfo codeInfo, CiCodeCredentials ciCodeCredentials) {
-//        int codeChoice = CODE_CHOICE_GIT;
-//        if (ciCodeCredentials.getCodeControlType() == CiConstant.CODE_TYPE_SVN) {
-//            codeChoice = CODE_CHOICE_SVN;
-//        }
-//        CodeManager codeManager = new CodeManager(codeChoice, ciCodeCredentials.getUniqueKey(), null, null, null);
-//        if (ciCodeCredentials.getCodeControlType() == CiConstant.CODE_TYPE_GITHUB
-//                || ciCodeCredentials.getCodeControlType() == CiConstant.CODE_TYPE_GITLAB) {
-//            Key key = new Key(null, ciCodeCredentials.getUserNameReplaceSpecialChar(),
-//                    ciCodeCredentials.getType().intValue());
-//            // codeName和codeRefspec参数均为空
-//            GitAdvancedConfig advanced = new GitAdvancedConfig(null, null);
-//            Repository repo = new Repository(codeInfo.getCodeUrl(), key, advanced);
-//            GitConfig gitConfig = new GitConfig(null, codeInfo.getCodeBranch(), repo);
-//            codeManager.setGitConfig(gitConfig);
-//        } else { //svn方式
-//            Key key = new Key(null, ciCodeCredentials.getUserName(), ciCodeCredentials.getType().intValue());
-//            Repository repo = new Repository(codeInfo.getCodeUrl(), key, null);
-//            SvnConfig svnConfig = new SvnConfig(codeInfo.getCodeBranch(), repo);
-//            codeManager.setSvnConfig(svnConfig);
-//        }
-//        return codeManager;
-//    }
-
-//    /**
-//     * 获取语言版本接口
-//     *
-//     * @param client
-//     * @return LangList
-//     * @throws SheraException
-//     * @date: 2018年12月21日 下午8:22:48
-//     */
-//    public LangList getLangList(SheraApi xcloudApi) throws SheraException {
-//        return xcloudApi.getAllLang(type);
-//    }
 
     /**
      * 根据编译json数据，获取编译的工具类型

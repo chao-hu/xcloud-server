@@ -360,6 +360,12 @@ public interface SonarService {
      */
     void restartCodeCheckTask(CodeCheckTask codeCheckTask);
 
+    /**
+     * 未使用
+     * @param tenantName
+     * @param pageable
+     * @return
+     */
     Page<CodeCheckTask> getCodeCheckTaskList(String tenantName, Pageable pageable);
 
     /**

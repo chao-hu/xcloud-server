@@ -11,7 +11,6 @@ import com.xxx.xcloud.module.devops.model.PhingModel;
  * php
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年5月30日 上午10:44:13
  */
 public class CiStrategyPhpJenkins extends AbstractCiStrategyJenkins {

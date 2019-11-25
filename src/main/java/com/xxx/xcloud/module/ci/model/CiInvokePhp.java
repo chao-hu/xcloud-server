@@ -1,11 +1,13 @@
 package com.xxx.xcloud.module.ci.model;
 
+import lombok.Data;
+
 /**
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年5月30日 上午11:13:39
  */
+@Data
 public class CiInvokePhp {
     /**
      * phing版本
@@ -21,29 +23,5 @@ public class CiInvokePhp {
      * build文件
      */
     private String phingBuildFile;
-
-    public String getPhingVersion() {
-        return phingVersion;
-    }
-
-    public void setPhingVersion(String phingVersion) {
-        this.phingVersion = phingVersion;
-    }
-
-    public String getTargets() {
-        return targets;
-    }
-
-    public void setTargets(String targets) {
-        this.targets = targets;
-    }
-
-    public String getPhingBuildFile() {
-        return phingBuildFile;
-    }
-
-    public void setPhingBuildFile(String phingBuildFile) {
-        this.phingBuildFile = phingBuildFile;
-    }
 
 }

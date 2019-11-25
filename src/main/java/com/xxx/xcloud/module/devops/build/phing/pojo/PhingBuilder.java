@@ -7,7 +7,6 @@ import javax.xml.bind.annotation.XmlElement;
  * phing构建参数
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年4月2日 上午10:15:39
  */
 public class PhingBuilder {

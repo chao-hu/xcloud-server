@@ -6,7 +6,6 @@ import lombok.*;
 
 /**
  * @ClassName: com.xxx.xcloud.module.ci.model.SwOperatorTask
- * @Description: TODO
  * @author: lizhen
  * @date: 2019年5月22日 下午7:44:39
  */
@@ -17,13 +16,5 @@ public class OperatorTaskDTO {
 
     @ApiModelProperty(value = "操作,执行：start，禁用：disable，启用：enable", required = true, example = "start", dataType = "String")
     private String operator;
-
-    public String getOperator() {
-        return operator;
-    }
-
-    public void setOperator(String operator) {
-        this.operator = operator;
-    }
 
 }

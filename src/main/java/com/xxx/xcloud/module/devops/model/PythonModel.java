@@ -3,7 +3,6 @@ package com.xxx.xcloud.module.devops.model;
 /**
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年4月3日 上午10:31:14
  */
 public class PythonModel {

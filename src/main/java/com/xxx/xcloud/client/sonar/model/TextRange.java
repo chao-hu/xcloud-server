@@ -4,7 +4,6 @@ package com.xxx.xcloud.client.sonar.model;
  * 错误文件范围
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年5月20日 上午10:49:32
  */
 public class TextRange {

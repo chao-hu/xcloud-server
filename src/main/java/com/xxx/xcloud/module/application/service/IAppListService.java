@@ -1,9 +1,10 @@
 package com.xxx.xcloud.module.application.service;
 
+import com.xxx.xcloud.module.application.entity.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.xxx.xcloud.module.application.entity.Service;
+import java.util.List;
 
 /**
  * 
@@ -72,4 +73,14 @@ public interface IAppListService {
      * @return 成功返回true，失败抛出异常
      */
     boolean cancleServiceAutomaticScale(String serviceId);
+
+    /**
+     * 根据镜像版本ID查询服务信息
+     *
+     * @param imageVersionId
+     *            镜像版本ID
+     * @return List<Service> 服务信息
+     * @date: 2019年3月5日 上午11:09:26
+     */
+    List<Service> getServicesByImageVersionId(String imageVersionId);
 }

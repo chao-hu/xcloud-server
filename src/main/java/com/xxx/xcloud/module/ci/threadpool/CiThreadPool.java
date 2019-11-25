@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
  * 构建线程池
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年5月16日 下午5:22:49
  */
 public class CiThreadPool {
@@ -31,7 +30,6 @@ public class CiThreadPool {
      * 线程池实例
      * 
      * @author mengaijun
-     * @Description: TODO
      * @date: 2019年5月16日 下午5:23:32
      */
     public static ThreadPoolExecutor getExecotur() {

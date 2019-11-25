@@ -1,18 +1,5 @@
 package com.xxx.xcloud.module.application.service.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.xxx.xcloud.client.kubernetes.KubernetesClientFactory;
@@ -49,7 +36,6 @@ import com.xxx.xcloud.rest.v1.service.model.ServiceInitContainerModelDTO;
 import com.xxx.xcloud.threadpool.BdosSyncService;
 import com.xxx.xcloud.utils.FileUtils;
 import com.xxx.xcloud.utils.StringUtils;
-
 import io.fabric8.kubernetes.api.model.Affinity;
 import io.fabric8.kubernetes.api.model.CephFSVolumeSource;
 import io.fabric8.kubernetes.api.model.ConfigMapVolumeSource;
@@ -86,6 +72,18 @@ import io.fabric8.kubernetes.api.model.Volume;
 import io.fabric8.kubernetes.api.model.VolumeMount;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentSpec;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -391,6 +389,16 @@ public class AppListServiceImpl implements IAppListService {
             throw new ErrorMessageException(ReturnCode.CODE_SQL_SAVE_INFO_FAILED, "删除hpa失败");
         }
         return true;
+    }
+
+    @Override
+    public List<Service> getServicesByImageVersionId(String imageVersionId) {
+        try {
+            return serviceRepository.findByImageVersionId(imageVersionId);
+        } catch (Exception e) {
+            LOG.error("根据镜像版本ID查询服务失败!", e);
+            throw new ErrorMessageException(ReturnCode.CODE_SQL_FIND_LIST_FAILED, "根据镜像ID查询使用镜像的服务信息失败!");
+        }
     }
 
     /**

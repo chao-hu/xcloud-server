@@ -6,7 +6,6 @@ import com.google.gson.annotations.SerializedName;
  * 仓库
  *
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年1月2日 下午5:59:39
  */
 public class GithubRepos {

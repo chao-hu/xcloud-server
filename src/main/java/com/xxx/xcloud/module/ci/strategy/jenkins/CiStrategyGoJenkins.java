@@ -11,7 +11,6 @@ import com.xxx.xcloud.module.ci.model.CiInvokeGo;
 /**
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年1月3日 下午6:06:02
  */
 public class CiStrategyGoJenkins extends AbstractCiStrategyJenkins {

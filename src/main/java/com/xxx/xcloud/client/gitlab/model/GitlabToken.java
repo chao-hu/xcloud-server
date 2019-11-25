@@ -6,7 +6,6 @@ import com.google.gson.annotations.SerializedName;
  * gitlab Token信息
  *
  * @author mengaijun
- * @Description: TODO
  * @date: 2018年12月21日 上午11:25:43
  */
 public class GitlabToken {

@@ -7,7 +7,6 @@ import com.xxx.xcloud.module.ci.entity.CodeInfo;
  * 代码检查信息详情
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年5月14日 下午4:57:32
  */
 public class CodeCheckInfo {

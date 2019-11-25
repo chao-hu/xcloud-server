@@ -5,7 +5,6 @@ import lombok.Data;
 
 /**
  * @ClassName: com.xxx.xcloud.rest.v1.code.check.model.SwModifyRulesetModel
- * @Description: TODO
  * @author: xjp
  * @date: 2019年5月28日 上午11:58:38
  */

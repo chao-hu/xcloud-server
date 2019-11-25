@@ -12,7 +12,6 @@ package com.xxx.xcloud.client.sonar.model;
 /**
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2018年12月10日 上午10:12:29
  */
 public class Param {

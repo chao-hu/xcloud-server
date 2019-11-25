@@ -5,7 +5,6 @@ import java.util.List;
 /**
  * QualityProfile集合
  * @author mengaijun
- * @Description: TODO
  * @date: 2018年12月27日 下午7:50:46
  */
 public class QualityProfiles {

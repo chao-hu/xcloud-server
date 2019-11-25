@@ -7,7 +7,6 @@ import com.xxx.xcloud.module.devops.model.Job;
  * 根据Job获取对象
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年4月2日 上午10:32:35
  */
 public interface PhingService {

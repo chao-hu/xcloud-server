@@ -14,7 +14,6 @@ import java.util.List;
 /**
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2018年12月10日 上午10:13:05
  */
 public class Rule {

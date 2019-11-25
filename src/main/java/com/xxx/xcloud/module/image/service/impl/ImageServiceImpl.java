@@ -22,6 +22,7 @@ import com.xxx.xcloud.common.Global;
 import com.xxx.xcloud.common.ReturnCode;
 import com.xxx.xcloud.common.XcloudProperties;
 import com.xxx.xcloud.common.exception.ErrorMessageException;
+import com.xxx.xcloud.module.application.service.IAppListService;
 import com.xxx.xcloud.module.ci.service.ICiService;
 import com.xxx.xcloud.module.cronjob.entity.Cronjob;
 import com.xxx.xcloud.module.cronjob.repository.CronjobRepository;
@@ -30,15 +31,20 @@ import com.xxx.xcloud.module.harbor.entity.HarborUser;
 import com.xxx.xcloud.module.harbor.repositpry.HarborUserRepository;
 import com.xxx.xcloud.module.image.consts.ImageConstant;
 import com.xxx.xcloud.module.image.entity.Image;
-import com.xxx.xcloud.module.image.model.ImageQualityStatistics;
 import com.xxx.xcloud.module.image.entity.ImageVersion;
 import com.xxx.xcloud.module.image.model.GroupImage;
 import com.xxx.xcloud.module.image.model.ImageDetail;
+import com.xxx.xcloud.module.image.model.ImageQualityStatistics;
 import com.xxx.xcloud.module.image.repository.ImageRepository;
 import com.xxx.xcloud.module.image.repository.ImageVersionRepository;
 import com.xxx.xcloud.module.image.service.ImageService;
 import com.xxx.xcloud.module.sonar.service.SonarService;
-import com.xxx.xcloud.utils.*;
+import com.xxx.xcloud.utils.FileUtil;
+import com.xxx.xcloud.utils.FileUtils;
+import com.xxx.xcloud.utils.FtpUtils;
+import com.xxx.xcloud.utils.PageUtil;
+import com.xxx.xcloud.utils.SpringContextHolder;
+import com.xxx.xcloud.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +63,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
 
@@ -90,6 +104,9 @@ public class ImageServiceImpl implements ImageService {
     @Autowired
     SonarService sonarService;
 
+    @Autowired
+    private IAppListService application;
+
     private static final Logger LOG = LoggerFactory.getLogger(ImageServiceImpl.class);
 
     /**
@@ -98,9 +115,7 @@ public class ImageServiceImpl implements ImageService {
     private static final Pattern PATTERN = Pattern.compile(ImageConstant.IMAGE_NAME_REGEX_STR);
 
     private static Interner<String> interner = Interners.newWeakInterner();
-    // TODO: 2019/11/12  
-    //    @Autowired
-    //    private Application application;
+
 
     @Override
     public Page<Image> getImages(String tenantName, String imageName, String projectId, Pageable pageable) {
@@ -445,12 +460,11 @@ public class ImageServiceImpl implements ImageService {
         if (imageType == imageVersion.getImageType()) {
             throw new ErrorMessageException(ReturnCode.CODE_CHECK_PARAM_NOT_UPDATE, "镜像公有私有信息未改变!");
         }
-        // TODO: 2019/11/12  判断镜像是否被使用
-        //        List<xxx.xcloud.module.application.entity.Service> services = application
-        //                .getServicesByImageVersionId(imageVersionid);
-        //        if (!services.isEmpty()) {
-        //            throw new ErrorMessageException(ReturnCode.CODE_CHECK_PARAM_NOT_UPDATE, "镜像已经被服务使用, 不允许修改公有私有属性!");
-        //        }
+        List<com.xxx.xcloud.module.application.entity.Service> services = application
+                .getServicesByImageVersionId(imageVersionid);
+        if (!services.isEmpty()) {
+            throw new ErrorMessageException(ReturnCode.CODE_CHECK_PARAM_NOT_UPDATE, "镜像已经被服务使用, 不允许修改公有私有属性!");
+        }
         // 如果是修改为公有的, 判断是否已有同名镜像被其他租户公有
         if (imageType == ImageConstant.IMAGE_TYPE_PUBLIC && isImagePublicByOther(image.getImageName(), tenantName)) {
             throw new ErrorMessageException(ReturnCode.CODE_CHECK_PARAM_IS_EXIST, "已有其他租户共享了同名镜像, 无法共享!");
@@ -725,7 +739,7 @@ public class ImageServiceImpl implements ImageService {
      * @date: 2019年3月26日 上午9:44:36
      */
     private Page<Image> findByTenantNameOrImageTypeAndImageNameLike(String tenantName, byte imageType, String imageName,
-            Pageable pageable) {
+                                                                    Pageable pageable) {
         try {
             return imageRepository
                     .getByTenantNameOrImageTypeAndImageNameLike(tenantName, imageType, "%" + imageName + "%", pageable);
@@ -745,7 +759,7 @@ public class ImageServiceImpl implements ImageService {
      * @date: 2019年3月26日 上午9:50:47
      */
     private Page<Image> findImagesByTenantNameAndImageNameLikePage(String tenantName, String imageName,
-            Pageable pageable) {
+                                                                   Pageable pageable) {
         try {
             return imageRepository.findByTenantNameAndImageNameLike(tenantName, "%" + imageName + "%", pageable);
         } catch (Exception e) {
@@ -959,12 +973,11 @@ public class ImageServiceImpl implements ImageService {
         // List<xxx.xcloud.module.application.entity.Service> serviceList =
         // serviceRepository
         // .findByImageId(imageVersionId);
-        // TODO: 2019/11/12
-        //        List<xxx.xcloud.module.application.entity.Service> serviceList = application
-        //                .getServicesByImageVersionId(imageVersionId);
-        //        if (null != serviceList && !serviceList.isEmpty()) {
-        //            throw new ErrorMessageException(ReturnCode.CODE_CHECK_PARAM_IS_EXIST, "有服务正在使用该镜像，无法删除");
-        //        }
+        List<com.xxx.xcloud.module.application.entity.Service> serviceList = application
+                .getServicesByImageVersionId(imageVersionId);
+        if (null != serviceList && !serviceList.isEmpty()) {
+            throw new ErrorMessageException(ReturnCode.CODE_CHECK_PARAM_IS_EXIST, "有服务正在使用该镜像，无法删除");
+        }
 
         List<Cronjob> taskCronjobs = cronjobRepository.findByImageVerisonId(imageVersionId);
         LOG.info("--------id---------" + imageVersionId);
@@ -1112,7 +1125,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public Image uploadImage(String tenantName, Byte imageType, String imageName, String description,
-            String imageVersion, String imageFilePath, String createdBy, String projectId) {
+                             String imageVersion, String imageFilePath, String createdBy, String projectId) {
         // 判断上传文件是否是tar包
         if (!imageFilePath.endsWith(ImageConstant.FILE_END_TAR)) {
             throw new ErrorMessageException(ReturnCode.CODE_CHECK_PARAM_IS_NOT_FORMAT, "镜像上传仅支持tar包上传!");
@@ -1184,7 +1197,7 @@ public class ImageServiceImpl implements ImageService {
      * @date: 2019年1月16日 下午3:21:21
      */
     private String loadImageFileFromFtp(String imageFilePath, String tenantName, String imageName,
-            String imageVersion) {
+                                        String imageVersion) {
         // 下载到本地目录
         String localPath =
                 XcloudProperties.getConfigMap().get(Global.CI_IMAGE_TEMP_PATH) + tenantName + File.separator + imageName
@@ -1204,7 +1217,7 @@ public class ImageServiceImpl implements ImageService {
                     XcloudProperties.getConfigMap().get(Global.FTP_USERNAME),
                     XcloudProperties.getConfigMap().get(Global.FTP_PASSWORD),
                     StringUtils.parseInt(XcloudProperties.getConfigMap().get(Global.FTP_PORT)), filePathPar, localPath,
-                    new String[] { fileName })) {
+                    new String[]{fileName})) {
                 return localPath + File.separator + fileName;
             }
             return null;
@@ -1214,7 +1227,7 @@ public class ImageServiceImpl implements ImageService {
                         XcloudProperties.getConfigMap().get(Global.FTP_USERNAME),
                         XcloudProperties.getConfigMap().get(Global.FTP_PASSWORD),
                         StringUtils.parseInt(XcloudProperties.getConfigMap().get(Global.FTP_PORT)), filePathPar,
-                        new String[] { fileName });
+                        new String[]{fileName});
             } catch (Exception e) {
                 LOG.error("删除在ftp上传的tar文件失败!", e);
             }
@@ -1363,7 +1376,7 @@ public class ImageServiceImpl implements ImageService {
      * @date: 2018年12月12日 上午11:42:48
      */
     private void loadPushInspectDelImage(Image image, ImageVersion imageVersion, File imageTarFile,
-            String imageFilePath) {
+                                         String imageFilePath) {
         HarborUser harborUser = getHarborUserByByTenantName(image.getTenantName());
         if (harborUser == null) {
             throw new ErrorMessageException(ReturnCode.CODE_CHECK_PARAM_IS_NOT_EXIST, "租户harbor信息不存在!");
@@ -1434,7 +1447,7 @@ public class ImageServiceImpl implements ImageService {
      * @date: 2018年12月13日 上午9:55:37
      */
     private String loadImage(Image image, ImageVersion imageVersion, File imageTarFile, String imageFilePath,
-            DockerClient dockerClient) {
+                             DockerClient dockerClient) {
         InputStream uploadStream = null;
         try {
             uploadStream = Files.newInputStream(Paths.get(imageFilePath));
@@ -1625,7 +1638,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public ImageDetail getDetailByTenantNameImageNameAndImageVersoin(String tenantName, String imageName,
-            String imageVersion) {
+                                                                     String imageVersion) {
         ImageDetail imageDetail = new ImageDetail();
         List<Image> images = getImagesByTenantNameAndImageName(tenantName, imageName);
         Image image = images.isEmpty() ? null : images.get(0);

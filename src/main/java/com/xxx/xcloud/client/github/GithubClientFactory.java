@@ -8,7 +8,6 @@ import com.xxx.xcloud.common.Global;
  * github接口
  *
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年1月7日 下午6:40:47
  */
 public class GithubClientFactory {

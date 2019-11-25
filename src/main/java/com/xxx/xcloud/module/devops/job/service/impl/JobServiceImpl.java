@@ -1,19 +1,25 @@
 package com.xxx.xcloud.module.devops.job.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.model.Build;
+import com.offbytwo.jenkins.model.Job;
 import com.offbytwo.jenkins.model.JobWithDetails;
+import com.xxx.xcloud.module.ci.consts.CiConstant;
 import com.xxx.xcloud.module.devops.actions.service.ActionsService;
 import com.xxx.xcloud.module.devops.build.service.BuildService;
 import com.xxx.xcloud.module.devops.build.wrappers.service.BuildWrappersService;
 import com.xxx.xcloud.module.devops.common.DevopsException;
+import com.xxx.xcloud.module.devops.job.pojo.Project;
 import com.xxx.xcloud.module.devops.job.service.JobService;
-import com.offbytwo.jenkins.model.Job;
 import com.xxx.xcloud.module.devops.properties.service.PropertiesService;
 import com.xxx.xcloud.module.devops.publishers.service.PublishersService;
+import com.xxx.xcloud.module.devops.scm.pojo.Scm;
 import com.xxx.xcloud.module.devops.scm.service.ScmService;
 import com.xxx.xcloud.module.devops.triggers.service.TriggersService;
 import com.xxx.xcloud.module.devops.util.DevopsClient;
+import com.xxx.xcloud.module.devops.util.JaxbUtil;
+import com.xxx.xcloud.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 
 /**
  * @author daien
@@ -58,53 +63,53 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void create(com.xxx.xcloud.module.devops.model.Job job, String jobType) throws DevopsException {
-//        DevopsClient devopsClient = DevopsClient.getClient();
-//        JenkinsServer jenkinsServer = devopsClient.getJenkinsServer();
-//
-//        // check namespace
-//        String namespace = job.getNamespace();
-//        if (StringUtils.isEmpty(namespace)) {
-//            throw new DevopsException(500, "namespace为空");
-//        }
-//
-//        // check name
-//        String name = job.getName();
-//        if (StringUtils.isEmpty(name)) {
-//            throw new DevopsException(500, "name为空");
-//        }
-//
-//        String jobName = generateJenkinsJobName(namespace, jobType, name);
-//        Scm scm = scmService.getScm(job.getScmModel());
-//        if (scm == null) {
-//            throw new DevopsException(500, "代码托管配置为空");
-//        }
-//
-//        Project project = new Project();
-//        project.setDescription(job.getDescription());
-//        project.setJdk(buildService.getJdkVersion(job));
-//        project.setScm(scm);
-//        project.setProperties(propertiesService.getProperties(job.getScmModel()));
-//        project.setTriggers(triggersService.getTriggers(job));
-//        project.setBuildWrappers(buildWrappersService.getBuildWrappers(job));
-//        project.setBuilders(buildService.getBuilders(job, jobType));
-//        project.setActions(actionsService.getActions(job));
-//        project.setPublishers(publishersService.getPublishers(job));
-//        if (job.getLanguageModel() != null) {
-//            project.setCustomWorkspace(CiConstant.DEVOPS_LANG_GO.equals(job.getLanguageModel().getLangType())
-//                    ? "${JENKINS_HOME}/workspace/" + jobName + "/src"
-//                    : null);
-//        }
-//
-//        JaxbUtil requestBinder = new JaxbUtil(Project.class, JaxbUtil.CollectionWrapper.class);
-//        String xmlString = requestBinder.toXml(project, "utf-8");
-//
-//        try {
-//            jenkinsServer.createJob(jobName, xmlString, true);
-//        } catch (IOException e) {
-//            String msg = "任务:" + jobName + "[" + JSON.toJSONString(job) + "]创建失败";
-//            logger.error(msg, e);
-//            throw new DevopsException(500, msg);
-//        }
+        DevopsClient devopsClient = DevopsClient.getClient();
+        JenkinsServer jenkinsServer = devopsClient.getJenkinsServer();
+
+        // check namespace
+        String namespace = job.getNamespace();
+        if (StringUtils.isEmpty(namespace)) {
+            throw new DevopsException(500, "namespace为空");
+        }
+
+        // check name
+        String name = job.getName();
+        if (StringUtils.isEmpty(name)) {
+            throw new DevopsException(500, "name为空");
+        }
+
+        String jobName = generateJenkinsJobName(namespace, jobType, name);
+        Scm scm = scmService.getScm(job.getScmModel());
+        if (scm == null) {
+            throw new DevopsException(500, "代码托管配置为空");
+        }
+
+        Project project = new Project();
+        project.setDescription(job.getDescription());
+        project.setJdk(buildService.getJdkVersion(job));
+        project.setScm(scm);
+        project.setProperties(propertiesService.getProperties(job.getScmModel()));
+        project.setTriggers(triggersService.getTriggers(job));
+        project.setBuildWrappers(buildWrappersService.getBuildWrappers(job));
+        project.setBuilders(buildService.getBuilders(job, jobType));
+        project.setActions(actionsService.getActions(job));
+        project.setPublishers(publishersService.getPublishers(job));
+        if (job.getLanguageModel() != null) {
+            project.setCustomWorkspace(CiConstant.DEVOPS_LANG_GO.equals(job.getLanguageModel().getLangType())
+                    ? "${JENKINS_HOME}/workspace/" + jobName + "/src"
+                    : null);
+        }
+
+        JaxbUtil requestBinder = new JaxbUtil(Project.class, JaxbUtil.CollectionWrapper.class);
+        String xmlString = requestBinder.toXml(project, "utf-8");
+
+        try {
+            jenkinsServer.createJob(jobName, xmlString, true);
+        } catch (IOException e) {
+            String msg = "任务:" + jobName + "[" + JSON.toJSONString(job) + "]创建失败";
+            logger.error(msg, e);
+            throw new DevopsException(500, msg);
+        }
     }
 
     @Override
@@ -122,41 +127,41 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void update(com.xxx.xcloud.module.devops.model.Job job, String jobType) throws DevopsException {
-//        DevopsClient devopsClient = DevopsClient.getClient();
-//        JenkinsServer jenkinsServer = devopsClient.getJenkinsServer();
-//
-//        String jobName = generateJenkinsJobName(job.getNamespace(), jobType, job.getName());
-//        Scm scm = scmService.getScm(job.getScmModel());
-//        if (scm == null) {
-//            throw new DevopsException(500, "代码托管配置为空");
-//        }
-//
-//        Project project = new Project();
-//        project.setDescription(job.getDescription());
-//        project.setJdk(buildService.getJdkVersion(job));
-//        project.setScm(scm);
-//        project.setProperties(propertiesService.getProperties(job.getScmModel()));
-//        project.setTriggers(triggersService.getTriggers(job));
-//        project.setBuildWrappers(buildWrappersService.getBuildWrappers(job));
-//        project.setBuilders(buildService.getBuilders(job, jobType));
-//        project.setActions(actionsService.getActions(job));
-//        project.setPublishers(publishersService.getPublishers(job));
-//        if (job.getLanguageModel() != null) {
-//            project.setCustomWorkspace(CiConstant.DEVOPS_LANG_GO.equals(job.getLanguageModel().getLangType())
-//                    ? "${JENKINS_HOME}/workspace/" + jobName + "/src"
-//                    : null);
-//        }
-//
-//        JaxbUtil requestBinder = new JaxbUtil(Project.class, JaxbUtil.CollectionWrapper.class);
-//        String xmlString = requestBinder.toXml(project, "utf-8");
-//
-//        try {
-//            jenkinsServer.updateJob(jobName, xmlString, true);
-//        } catch (IOException e) {
-//            String msg = "任务:" + jobName + "[" + JSON.toJSONString(job) + "]更新失败";
-//            logger.error(msg, e);
-//            throw new DevopsException(500, msg);
-//        }
+        DevopsClient devopsClient = DevopsClient.getClient();
+        JenkinsServer jenkinsServer = devopsClient.getJenkinsServer();
+
+        String jobName = generateJenkinsJobName(job.getNamespace(), jobType, job.getName());
+        Scm scm = scmService.getScm(job.getScmModel());
+        if (scm == null) {
+            throw new DevopsException(500, "代码托管配置为空");
+        }
+
+        Project project = new Project();
+        project.setDescription(job.getDescription());
+        project.setJdk(buildService.getJdkVersion(job));
+        project.setScm(scm);
+        project.setProperties(propertiesService.getProperties(job.getScmModel()));
+        project.setTriggers(triggersService.getTriggers(job));
+        project.setBuildWrappers(buildWrappersService.getBuildWrappers(job));
+        project.setBuilders(buildService.getBuilders(job, jobType));
+        project.setActions(actionsService.getActions(job));
+        project.setPublishers(publishersService.getPublishers(job));
+        if (job.getLanguageModel() != null) {
+            project.setCustomWorkspace(CiConstant.DEVOPS_LANG_GO.equals(job.getLanguageModel().getLangType())
+                    ? "${JENKINS_HOME}/workspace/" + jobName + "/src"
+                    : null);
+        }
+
+        JaxbUtil requestBinder = new JaxbUtil(Project.class, JaxbUtil.CollectionWrapper.class);
+        String xmlString = requestBinder.toXml(project, "utf-8");
+
+        try {
+            jenkinsServer.updateJob(jobName, xmlString, true);
+        } catch (IOException e) {
+            String msg = "任务:" + jobName + "[" + JSON.toJSONString(job) + "]更新失败";
+            logger.error(msg, e);
+            throw new DevopsException(500, msg);
+        }
     }
 
     @Override

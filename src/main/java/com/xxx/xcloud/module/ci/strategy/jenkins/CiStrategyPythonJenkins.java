@@ -9,7 +9,6 @@ import com.xxx.xcloud.module.devops.model.PythonModel;
 
 /**
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年1月3日 下午6:06:25
  */
 public class CiStrategyPythonJenkins extends AbstractCiStrategyJenkins {

@@ -15,7 +15,6 @@ import java.util.Map;
 /**
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2018年12月10日 上午10:13:11
  */
 public class Rules {

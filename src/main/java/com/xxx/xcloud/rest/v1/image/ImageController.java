@@ -5,6 +5,8 @@ import com.xxx.xcloud.common.ApiResult;
 import com.xxx.xcloud.common.Global;
 import com.xxx.xcloud.common.ReturnCode;
 import com.xxx.xcloud.common.exception.ErrorMessageException;
+import com.xxx.xcloud.module.application.entity.Service;
+import com.xxx.xcloud.module.application.service.IAppListService;
 import com.xxx.xcloud.module.ci.entity.Ci;
 import com.xxx.xcloud.module.ci.service.ICiService;
 import com.xxx.xcloud.module.image.consts.ImageConstant;
@@ -27,7 +29,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 import java.util.Objects;
@@ -53,24 +60,23 @@ public class ImageController {
     @Autowired
     private TenantServiceImplV1 tenantService;
 
-    // TODO: 2019/11/12  引用应用服务
-    //    @Autowired
-    //    private Application application;
+    @Autowired
+    private IAppListService application;
 
     @ResponseBody
-    @RequestMapping(value = { "" }, method = RequestMethod.GET)
+    @RequestMapping(value = {""}, method = RequestMethod.GET)
     @ApiOperation(value = "获取镜像列表", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "tenantName", value = "租户名称", required = true, dataType = "String"),
             @ApiImplicitParam(paramType = "query", name = "projectId", value = "项目ID", required = false, dataType = "String"),
             @ApiImplicitParam(paramType = "query", name = "imageName", value = "镜像名称", required = false, dataType = "String"),
             @ApiImplicitParam(paramType = "query", name = "page", value = "页数", required = false, dataType = "int", defaultValue = "0"),
-            @ApiImplicitParam(paramType = "query", name = "size", value = "每页数量", required = false, dataType = "int", defaultValue = "2000") })
+            @ApiImplicitParam(paramType = "query", name = "size", value = "每页数量", required = false, dataType = "int", defaultValue = "2000")})
     public ApiResult getImageGroup(@RequestParam(value = "tenantName", required = true) String tenantName,
-            @RequestParam(value = "projectId", required = false) String projectId,
-            @RequestParam(value = "imageName", required = false) String imageName,
-            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "2000") int size) {
+                                   @RequestParam(value = "projectId", required = false) String projectId,
+                                   @RequestParam(value = "imageName", required = false) String imageName,
+                                   @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                   @RequestParam(value = "size", required = false, defaultValue = "2000") int size) {
 
         ApiResult apiResult;
 
@@ -101,10 +107,10 @@ public class ImageController {
     }
 
     @ResponseBody
-    @RequestMapping(value = { "/{imageId}" }, method = RequestMethod.GET)
+    @RequestMapping(value = {"/{imageId}"}, method = RequestMethod.GET)
     @ApiOperation(value = "根据镜像ID, 获取镜像信息", notes = "")
     @ApiImplicitParams({
-            @ApiImplicitParam(paramType = "path", name = "imageId", value = "镜像名称", required = true, dataType = "String") })
+            @ApiImplicitParam(paramType = "path", name = "imageId", value = "镜像名称", required = true, dataType = "String")})
     public ApiResult getImageByImageId(@PathVariable("imageId") String imageId) {
 
         ApiResult apiResult = null;
@@ -138,17 +144,17 @@ public class ImageController {
     }
 
     @ResponseBody
-    @RequestMapping(value = { "/imageVersion/{imageId}" }, method = RequestMethod.GET)
+    @RequestMapping(value = {"/imageVersion/{imageId}"}, method = RequestMethod.GET)
     @ApiOperation(value = "根据镜像ID, 获取镜像版本信息", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "path", name = "imageId", value = "镜像ID", required = true, dataType = "String"),
             @ApiImplicitParam(paramType = "query", name = "projectId", value = "项目ID", required = false, dataType = "String"),
             @ApiImplicitParam(paramType = "query", name = "page", value = "页数", required = false, dataType = "int", defaultValue = "0"),
-            @ApiImplicitParam(paramType = "query", name = "size", value = "每页数量", required = false, dataType = "int", defaultValue = "2000") })
+            @ApiImplicitParam(paramType = "query", name = "size", value = "每页数量", required = false, dataType = "int", defaultValue = "2000")})
     public ApiResult getImageVersionsByImageId(@PathVariable("imageId") String imageId,
-            @RequestParam(value = "projectId", required = false) String projectId,
-            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "2000") int size) {
+                                               @RequestParam(value = "projectId", required = false) String projectId,
+                                               @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                               @RequestParam(value = "size", required = false, defaultValue = "2000") int size) {
 
         ApiResult apiResult = null;
 
@@ -185,17 +191,17 @@ public class ImageController {
     }
 
     @ResponseBody
-    @RequestMapping(value = { "/public" }, method = RequestMethod.GET)
+    @RequestMapping(value = {"/public"}, method = RequestMethod.GET)
     @ApiOperation(value = "获取公共镜像列表", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "projectId", value = "项目ID", required = false, dataType = "String"),
             @ApiImplicitParam(paramType = "query", name = "imageName", value = "镜像名称", required = false, dataType = "String"),
             @ApiImplicitParam(paramType = "query", name = "page", value = "页数", required = false, dataType = "int", defaultValue = "0"),
-            @ApiImplicitParam(paramType = "query", name = "size", value = "每页数量", required = false, dataType = "int", defaultValue = "2000") })
+            @ApiImplicitParam(paramType = "query", name = "size", value = "每页数量", required = false, dataType = "int", defaultValue = "2000")})
     public ApiResult getPublicImages(@RequestParam(value = "projectId", required = false) String projectId,
-            @RequestParam(value = "imageName", required = false) String imageName,
-            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "2000") int size) {
+                                     @RequestParam(value = "imageName", required = false) String imageName,
+                                     @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                     @RequestParam(value = "size", required = false, defaultValue = "2000") int size) {
 
         ApiResult apiResult;
 
@@ -228,19 +234,19 @@ public class ImageController {
     }
 
     @ResponseBody
-    @RequestMapping(value = { "/ownAndPublic" }, method = RequestMethod.GET)
+    @RequestMapping(value = {"/ownAndPublic"}, method = RequestMethod.GET)
     @ApiOperation(value = "获取自己的和公共镜像列表", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "tenantName", value = "租户名称", required = true, dataType = "String"),
             @ApiImplicitParam(paramType = "query", name = "projectId", value = "项目ID", required = false, dataType = "String"),
             @ApiImplicitParam(paramType = "query", name = "imageName", value = "镜像名称", required = false, dataType = "String"),
             @ApiImplicitParam(paramType = "query", name = "page", value = "页数", required = false, dataType = "int", defaultValue = "0"),
-            @ApiImplicitParam(paramType = "query", name = "size", value = "每页数量", required = false, dataType = "int", defaultValue = "2000") })
+            @ApiImplicitParam(paramType = "query", name = "size", value = "每页数量", required = false, dataType = "int", defaultValue = "2000")})
     public ApiResult getOwnAndPublicImages(@RequestParam(value = "tenantName", required = true) String tenantName,
-            @RequestParam(value = "projectId", required = false) String projectId,
-            @RequestParam(value = "imageName", required = false) String imageName,
-            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "2000") int size) {
+                                           @RequestParam(value = "projectId", required = false) String projectId,
+                                           @RequestParam(value = "imageName", required = false) String imageName,
+                                           @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                           @RequestParam(value = "size", required = false, defaultValue = "2000") int size) {
 
         ApiResult apiResult;
 
@@ -267,17 +273,17 @@ public class ImageController {
     }
 
     @ResponseBody
-    @RequestMapping(value = { "/public/imageVersion/{imageId}" }, method = RequestMethod.GET)
+    @RequestMapping(value = {"/public/imageVersion/{imageId}"}, method = RequestMethod.GET)
     @ApiOperation(value = "根据镜像ID, 获取公共镜像版本信息", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "path", name = "imageId", value = "镜像ID", required = true, dataType = "String"),
             @ApiImplicitParam(paramType = "query", name = "projectId", value = "项目ID", required = false, dataType = "String"),
             @ApiImplicitParam(paramType = "query", name = "page", value = "页数", required = false, dataType = "int", defaultValue = "0"),
-            @ApiImplicitParam(paramType = "query", name = "size", value = "每页数量", required = false, dataType = "int", defaultValue = "2000") })
+            @ApiImplicitParam(paramType = "query", name = "size", value = "每页数量", required = false, dataType = "int", defaultValue = "2000")})
     public ApiResult getPublicImageVersionsByImageId(@PathVariable("imageId") String imageId,
-            @RequestParam(value = "projectId", required = false) String projectId,
-            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "2000") int size) {
+                                                     @RequestParam(value = "projectId", required = false) String projectId,
+                                                     @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                                     @RequestParam(value = "size", required = false, defaultValue = "2000") int size) {
 
         ApiResult apiResult = null;
 
@@ -315,10 +321,10 @@ public class ImageController {
     }
 
     @ResponseBody
-    @RequestMapping(value = { "/public/imageVersionNum/{imageId}" }, method = RequestMethod.GET)
+    @RequestMapping(value = {"/public/imageVersionNum/{imageId}"}, method = RequestMethod.GET)
     @ApiOperation(value = "根据镜像ID, 获取公共镜像版本数量信息", notes = "")
     @ApiImplicitParams({
-            @ApiImplicitParam(paramType = "path", name = "imageId", value = "镜像ID", required = true, dataType = "String") })
+            @ApiImplicitParam(paramType = "path", name = "imageId", value = "镜像ID", required = true, dataType = "String")})
     public ApiResult getPublicImageVersionNumByImageId(@PathVariable("imageId") String imageId) {
 
         ApiResult apiResult = null;
@@ -361,15 +367,15 @@ public class ImageController {
     }
 
     @ResponseBody
-    @RequestMapping(value = { "/imageName" }, method = RequestMethod.GET)
+    @RequestMapping(value = {"/imageName"}, method = RequestMethod.GET)
     @ApiOperation(value = "获取镜像，判断是否已经存在", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "tenantName", value = "租户名称", required = true, dataType = "String"),
             @ApiImplicitParam(paramType = "query", name = "imageName", value = "镜像名称", required = true, dataType = "String"),
-            @ApiImplicitParam(paramType = "query", name = "imageVersion", value = "镜像版本", required = true, dataType = "String"), })
+            @ApiImplicitParam(paramType = "query", name = "imageVersion", value = "镜像版本", required = true, dataType = "String"),})
     public ApiResult getImageByName(@RequestParam(value = "tenantName", required = true) String tenantName,
-            @RequestParam(value = "imageName", required = true) String imageName,
-            @RequestParam(value = "imageVersion", required = true) String imageVersion) {
+                                    @RequestParam(value = "imageName", required = true) String imageName,
+                                    @RequestParam(value = "imageVersion", required = true) String imageVersion) {
 
         ApiResult apiResult;
 
@@ -423,7 +429,7 @@ public class ImageController {
     }
 
     @ResponseBody
-    @RequestMapping(value = { "/{imageVersionId}" }, method = RequestMethod.DELETE)
+    @RequestMapping(value = {"/{imageVersionId}"}, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除镜像", notes = "")
     public ApiResult deleteImage(@PathVariable String imageVersionId) {
 
@@ -446,7 +452,7 @@ public class ImageController {
     }
 
     @ResponseBody
-    @RequestMapping(value = { "" }, method = RequestMethod.POST)
+    @RequestMapping(value = {""}, method = RequestMethod.POST)
     @ApiOperation(value = "上传镜像", notes = "")
     public ApiResult uploadImage(@RequestBody UploadImageDTO image) {
 
@@ -484,11 +490,11 @@ public class ImageController {
     }
 
     @ResponseBody
-    @RequestMapping(value = { "/modify/type/{imageVersionId}" }, method = RequestMethod.PUT)
+    @RequestMapping(value = {"/modify/type/{imageVersionId}"}, method = RequestMethod.PUT)
     @ApiOperation(value = "修改镜像类型", notes = "")
     @ApiImplicitParam(paramType = "path", name = "imageVersionId", value = "镜像记录ID", required = true, dataType = "String")
     public ApiResult modifyImage(@PathVariable("imageVersionId") String imageVersionId,
-            @RequestBody UpdateImageTypeDTO json) {
+                                 @RequestBody UpdateImageTypeDTO json) {
         ApiResult apiResult;
 
         Byte imageType = json.getImageType();
@@ -518,11 +524,11 @@ public class ImageController {
     }
 
     @ResponseBody
-    @RequestMapping(value = { "/modify/env/{imageVersionId}" }, method = RequestMethod.PUT)
+    @RequestMapping(value = {"/modify/env/{imageVersionId}"}, method = RequestMethod.PUT)
     @ApiOperation(value = "修改镜像类型环境变量", notes = "")
     @ApiImplicitParam(paramType = "path", name = "imageVersionId", value = "镜像记录ID", required = true, dataType = "String")
     public ApiResult modifyImageEnv(@PathVariable("imageVersionId") String imageVersionId,
-            @RequestBody UpdateImageTypeDTO json) {
+                                    @RequestBody UpdateImageTypeDTO json) {
         ApiResult apiResult;
 
         String envVariables = json.getEnvVariables();
@@ -548,7 +554,7 @@ public class ImageController {
     }
 
     @ResponseBody
-    @RequestMapping(value = { "/modify/description/{imageId}" }, method = RequestMethod.PUT)
+    @RequestMapping(value = {"/modify/description/{imageId}"}, method = RequestMethod.PUT)
     @ApiOperation(value = "修改镜像描述", notes = "")
     @ApiImplicitParam(paramType = "path", name = "imageId", value = "镜像记录ID", required = true, dataType = "String")
     public ApiResult modifyImage(@PathVariable("imageId") String imageId, @RequestBody UpdateImageDescriptionDTO json) {
@@ -572,10 +578,10 @@ public class ImageController {
     }
 
     @ResponseBody
-    @RequestMapping(value = { "/use/{imageVersionId}" }, method = RequestMethod.GET)
+    @RequestMapping(value = {"/use/{imageVersionId}"}, method = RequestMethod.GET)
     @ApiOperation(value = "根据镜像版本ID判断镜像是否被使用", notes = "")
     @ApiImplicitParams({
-            @ApiImplicitParam(paramType = "path", name = "imageVersionId", value = "镜像版本记录ID", required = true, dataType = "String") })
+            @ApiImplicitParam(paramType = "path", name = "imageVersionId", value = "镜像版本记录ID", required = true, dataType = "String")})
     public ApiResult isImageUsing(@PathVariable("imageVersionId") String imageVersionId) {
         ApiResult apiResult = null;
 
@@ -583,13 +589,12 @@ public class ImageController {
             imageVersionId = "";
         }
         try {
-            // TODO: 2019/11/12
-            //            List<Service> services = application.getServicesByImageVersionId(imageVersionId);
-            //            if (services.size() > 0) {
-            //                apiResult = new ApiResult(ReturnCode.CODE_SUCCESS, true, "镜像已经被使用!");
-            //            } else {
-            //                apiResult = new ApiResult(ReturnCode.CODE_SUCCESS, false, "镜像没有被使用!");
-            //            }
+            List<Service> services = application.getServicesByImageVersionId(imageVersionId);
+            if (services.size() > 0) {
+                apiResult = new ApiResult(ReturnCode.CODE_SUCCESS, true, "镜像已经被使用!");
+            } else {
+                apiResult = new ApiResult(ReturnCode.CODE_SUCCESS, false, "镜像没有被使用!");
+            }
         } catch (ErrorMessageException e) {
             apiResult = new ApiResult(e.getCode(), e.getMessage());
         }
@@ -598,7 +603,7 @@ public class ImageController {
     }
 
     private ApiResult checkUploadParam(String tenantName, String imageName, byte imageType, String imageVersion,
-            String imageFilePath) {
+                                       String imageFilePath) {
 
         ApiResult apiResult;
 
@@ -643,12 +648,12 @@ public class ImageController {
     }
 
     @ResponseBody
-    @RequestMapping(value = { "/info" }, method = RequestMethod.GET)
+    @RequestMapping(value = {"/info"}, method = RequestMethod.GET)
     @ApiOperation(value = "根据镜像版本ID获取镜像详情或根据租户名和镜像名获取镜像信息(都填写，根据镜像版本ID查询)", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "imageVersionId", value = "镜像版本Id", required = false, dataType = "String"),
             @ApiImplicitParam(paramType = "query", name = "tenantName", value = "租户名称", required = false, dataType = "String"),
-            @ApiImplicitParam(paramType = "query", name = "imageName", value = "镜像名称", required = false, dataType = "String") })
+            @ApiImplicitParam(paramType = "query", name = "imageName", value = "镜像名称", required = false, dataType = "String")})
     public ApiResult getImageByQueryInfo(
             @RequestParam(value = "imageVersionId", required = false) String imageVersionId,
             @RequestParam(value = "tenantName", required = false) String tenantName,
@@ -694,7 +699,7 @@ public class ImageController {
     }
 
     @ResponseBody
-    @RequestMapping(value = { "/imagequalitymetric" }, method = RequestMethod.GET)
+    @RequestMapping(value = {"/imagequalitymetric"}, method = RequestMethod.GET)
     @ApiOperation(value = "获取镜像质量统计结果", notes = "")
     public ApiResult getImageByQueryInfo() {
         ApiResult apiResult = null;

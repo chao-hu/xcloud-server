@@ -3,7 +3,6 @@ package com.xxx.xcloud.module.devops.model;
 /**
  * maven 模型
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年3月18日 下午3:10:18
  */
 public class MvnModel {

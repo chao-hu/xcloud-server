@@ -1,18 +1,16 @@
 package com.xxx.xcloud.client.gitlab;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.xxx.xcloud.client.gitlab.exception.GitlabException;
 import com.xxx.xcloud.client.rest.ApiClient;
-
 import feign.Response;
 import feign.codec.ErrorDecoder;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * gitlab接口实例工具
  *
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年1月7日 下午6:48:31
  */
 public class GitlabClientFactory {
@@ -30,7 +28,6 @@ public class GitlabClientFactory {
      * Giblab接口异常类
      *
      * @author mengaijun
-     * @Description: TODO
      * @date: 2018年12月21日 上午9:37:22
      */
     static class GitlabErrorDecoder implements ErrorDecoder {
@@ -122,7 +119,6 @@ public class GitlabClientFactory {
      * gitlab api版本
      *
      * @author mengaijun
-     * @Description: TODO
      * @date: 2019年8月8日 下午5:49:19
      */
     public enum ApiVersion {

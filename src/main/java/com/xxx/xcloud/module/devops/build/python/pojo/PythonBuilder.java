@@ -7,7 +7,6 @@ import javax.xml.bind.annotation.XmlElement;
  * python构建信息
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年4月3日 上午10:23:01
  */
 public class PythonBuilder {

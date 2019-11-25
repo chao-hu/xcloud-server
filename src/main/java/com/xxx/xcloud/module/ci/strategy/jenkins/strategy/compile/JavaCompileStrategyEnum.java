@@ -20,7 +20,6 @@ import java.util.Objects;
  * java编译工具枚举策略
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年8月6日 下午3:18:34
  */
 public enum JavaCompileStrategyEnum {

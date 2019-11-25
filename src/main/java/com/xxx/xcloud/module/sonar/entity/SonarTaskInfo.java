@@ -10,7 +10,6 @@ import java.util.Date;
 /**
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年5月20日 上午11:24:05
  */
 @Entity

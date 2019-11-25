@@ -4,7 +4,6 @@ package com.xxx.xcloud.client.github.model;
  * 分支
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2019年1月2日 下午5:59:28
  */
 public class GitHubBranch {

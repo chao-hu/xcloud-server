@@ -14,7 +14,6 @@ public class PublishersServiceImpl implements PublishersService {
 
     @Override
     public Publishers getPublishers(Job jobModel) {
-        // TODO Auto-generated method stub
         return null;
     }
 

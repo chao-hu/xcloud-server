@@ -3,7 +3,6 @@ package com.xxx.xcloud.module.ci.consts;
 /**
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2018年12月7日 下午5:45:54
  */
 public class CiConstant {

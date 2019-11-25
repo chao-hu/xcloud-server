@@ -14,7 +14,6 @@ import java.util.List;
 /**
  * 
  * @author mengaijun
- * @Description: TODO
  * @date: 2018年12月10日 上午10:12:41
  */
 public class QualityProfileInheritance {

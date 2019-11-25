@@ -12,7 +12,6 @@ import com.xxx.xcloud.common.exception.ErrorMessageException;
 /**
  *
  * @author mengaijun
- * @Description: TODO
  * @date: 2018年12月11日 下午2:07:43
  */
 public class DockerClientFactory {
