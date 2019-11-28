@@ -24,9 +24,9 @@ import com.xxx.xcloud.module.component.entity.StatefulNode;
 import com.xxx.xcloud.module.component.entity.StatefulService;
 import com.xxx.xcloud.module.component.service.IComponentService;
 import com.xxx.xcloud.utils.PageUtil;
-import com.xxx.xcloud.rest.v1.component.model.OperatorDTO;
 import com.xxx.xcloud.rest.v1.component.model.PrometheusConfigDTO;
 import com.xxx.xcloud.rest.v1.component.model.PrometheusCreateDTO;
+import com.xxx.xcloud.rest.v1.component.model.PrometheusOperatorDTO;
 import com.xxx.xcloud.rest.v1.component.model.UpdateResourceDTO;
 
 import io.swagger.annotations.Api;
@@ -90,7 +90,7 @@ public class PrometheusController {
     @ApiOperation(value = "服务启动,服务停止", notes = "")
     @ApiImplicitParam(paramType = "path", name = "serviceId", value = "prometheus服务ID", required = true, dataType = "String")
     public ApiResult operatorPrometheusCluster(@PathVariable("serviceId") String serviceId,
-            @RequestBody OperatorDTO json) {
+            @RequestBody PrometheusOperatorDTO json) {
 
         String tenantName = json.getTenantName();
         String operator = json.getOperator();

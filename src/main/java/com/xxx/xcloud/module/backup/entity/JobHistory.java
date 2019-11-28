@@ -1,4 +1,4 @@
-package com.xxx.xcloud.module.component.entity;
+package com.xxx.xcloud.module.backup.entity;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

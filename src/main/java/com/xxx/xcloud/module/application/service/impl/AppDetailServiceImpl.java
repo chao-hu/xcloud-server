@@ -25,7 +25,7 @@ import com.xxx.xcloud.module.application.service.IAppDetailService;
 import com.xxx.xcloud.module.image.entity.Image;
 import com.xxx.xcloud.module.image.service.ImageService;
 import com.xxx.xcloud.rest.v1.service.model.Event;
-import com.xxx.xcloud.threadpool.BdosSyncService;
+import com.xxx.xcloud.threadpool.XcloudSyncService;
 import com.xxx.xcloud.utils.DateUtil;
 import com.xxx.xcloud.utils.StringUtils;
 
@@ -53,7 +53,7 @@ public class AppDetailServiceImpl implements IAppDetailService {
     private ImageService imageService;
 
     @Autowired
-    private BdosSyncService bdosSyncService;
+    private XcloudSyncService bdosSyncService;
 
     @Override
     public Service getServiceById(String serviceId) {

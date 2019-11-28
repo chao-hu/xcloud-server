@@ -1,4 +1,4 @@
-package com.xxx.xcloud.module.component.service;
+package com.xxx.xcloud.module.backup.service;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.xxx.xcloud.common.exception.ErrorMessageException;
-import com.xxx.xcloud.module.component.entity.JobHistory;
+import com.xxx.xcloud.module.backup.entity.JobHistory;
 
 /**
  * @ClassName: IJobHistoryService

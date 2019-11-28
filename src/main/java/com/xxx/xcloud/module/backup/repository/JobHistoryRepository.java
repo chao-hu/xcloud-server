@@ -1,4 +1,4 @@
-package com.xxx.xcloud.module.component.repository;
+package com.xxx.xcloud.module.backup.repository;
 
 import java.util.Date;
 import java.util.List;
@@ -9,11 +9,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.xxx.xcloud.module.component.entity.JobHistory;
+import com.xxx.xcloud.module.backup.entity.JobHistory;
+
 
 /**
- * @author xujiangpeng
- * @date 2018/5/5
+ * @ClassName: JobHistoryRepository
+ * @Description: job history表数据库操作
+ * @author lnn
+ * @date 2019年11月25日
+ *
  */
 @Repository
 public interface JobHistoryRepository extends JpaRepository<JobHistory, String> {

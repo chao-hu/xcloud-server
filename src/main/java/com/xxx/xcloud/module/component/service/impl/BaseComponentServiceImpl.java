@@ -1021,6 +1021,7 @@ public abstract class BaseComponentServiceImpl implements IComponentService {
         return isDependence;
     }
 
+    @Override
     public Map<String, String> checkClusterChangeConfigPersonaliseParameters(String tenantName, String serviceId,
             String opt, JSONObject configuration) throws ErrorMessageException {
         // TODO Auto-generated method stub

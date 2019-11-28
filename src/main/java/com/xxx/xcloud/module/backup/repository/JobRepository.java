@@ -1,4 +1,4 @@
-package com.xxx.xcloud.module.component.repository;
+package com.xxx.xcloud.module.backup.repository;
 
 import java.util.List;
 
@@ -7,11 +7,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.xxx.xcloud.module.component.entity.Job;
+import com.xxx.xcloud.module.backup.entity.Job;
+
 
 /**
- * @author xujiangpeng
- * @date 2018/5/5
+ * @ClassName: JobRepository
+ * @Description: job数据库操作
+ * @author lnn
+ * @date 2019年11月25日
+ *
  */
 @Repository
 public interface JobRepository extends JpaRepository<Job, String> {

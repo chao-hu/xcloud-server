@@ -7,6 +7,7 @@ import com.xxx.xcloud.common.Global;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 
 /**
@@ -16,6 +17,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @date 2019年11月14日
  *
  */
+@Data
 @ApiModel(value = "Prometheus操作请求模型")
 public class PrometheusOperatorDTO {
 

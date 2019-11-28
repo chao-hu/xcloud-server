@@ -33,7 +33,7 @@ import com.xxx.xcloud.module.ingress.service.IngressProxyService;
 import com.xxx.xcloud.rest.v1.service.model.ServiceHostAliasesModelDTO;
 import com.xxx.xcloud.rest.v1.service.model.ServiceInitContainerCommandModelDTO;
 import com.xxx.xcloud.rest.v1.service.model.ServiceInitContainerModelDTO;
-import com.xxx.xcloud.threadpool.BdosSyncService;
+import com.xxx.xcloud.threadpool.XcloudSyncService;
 import com.xxx.xcloud.utils.FileUtils;
 import com.xxx.xcloud.utils.StringUtils;
 import io.fabric8.kubernetes.api.model.Affinity;
@@ -117,7 +117,7 @@ public class AppListServiceImpl implements IAppListService {
     private ServiceContainerLifecycleRepository serviceContainerLifecycleRepository;
 
     @Autowired
-    private BdosSyncService bdosSyncService;
+    private XcloudSyncService bdosSyncService;
 
     @Autowired
     private ConfigService configService;

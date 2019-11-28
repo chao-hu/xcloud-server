@@ -1,4 +1,4 @@
-package com.xxx.xcloud.module.component.service;
+package com.xxx.xcloud.module.backup.service;
 
 import java.util.List;
 
@@ -6,11 +6,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.xxx.xcloud.common.exception.ErrorMessageException;
-import com.xxx.xcloud.module.component.entity.Job;
+import com.xxx.xcloud.module.backup.entity.Job;
 
 /**
- * @author xujiangpeng
- * @date 2018/5/5
+ * @ClassName: IJobService
+ * @Description: job接口
+ * @author lnn
+ * @date 2019年11月25日
+ *
  */
 public interface IJobService {
 

@@ -1,4 +1,4 @@
-package com.xxx.xcloud.module.component.service.impl;
+package com.xxx.xcloud.module.backup.service.impl;
 
 import java.io.File;
 import java.util.Calendar;
@@ -17,10 +17,10 @@ import com.xxx.xcloud.common.XcloudProperties;
 import com.xxx.xcloud.common.Global;
 import com.xxx.xcloud.common.ReturnCode;
 import com.xxx.xcloud.common.exception.ErrorMessageException;
+import com.xxx.xcloud.module.backup.entity.JobHistory;
+import com.xxx.xcloud.module.backup.repository.JobHistoryRepository;
+import com.xxx.xcloud.module.backup.service.IJobHistoryService;
 import com.xxx.xcloud.module.component.consts.MysqlBackupConst;
-import com.xxx.xcloud.module.component.entity.JobHistory;
-import com.xxx.xcloud.module.component.repository.JobHistoryRepository;
-import com.xxx.xcloud.module.component.service.IJobHistoryService;
 import com.xxx.xcloud.utils.FtpUtils;
 import com.xxx.xcloud.utils.StringUtils;
 

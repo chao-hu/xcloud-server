@@ -1,146 +1,183 @@
-package com.xxx.xcloud.module.component.model.backup;
+package com.xxx.xcloud.module.backup.entity;
 
 import java.util.Date;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.GenericGenerator;
+
+import com.alibaba.fastjson.annotation.JSONField;
 
 /**
- * @ClassName: SwJobModel
- * @Description: 备份任务模型
+ * @ClassName: Job
+ * @Description: mysql备份任务job表
  * @author lnn
- * @date 2019年11月15日
+ * @date 2019年11月14日
  *
  */
-@ApiModel(value = "备份任务模型")
-public class SwJobModel {
+@Entity
+@Table(name = "`STATEFUL_SERVICE_OPERATIONS_JOB`", indexes = {
+        @Index(name = "`idx_serviceId`", columnList = "`SERVICE_ID`") })
+public class Job {
+
+    /**
+     * @Fields: 任务id
+     */
+    @Id
+    @GeneratedValue(generator = "uuidGenerator")
+    @GenericGenerator(name = "uuidGenerator", strategy = "uuid")
+    @Column(name = "`ID`")
+    private String id;
 
     /**
      * @Fields: 任务名称
      */
-    @ApiModelProperty(value = "租户名称", required = true, example = "testtenant", dataType = "String")
-    private String tenantName;
-
-    /**
-     * @Fields: 任务名称
-     */
-    @ApiModelProperty(value = "任务名称", required = true, example = "", dataType = "String")
+    @NotEmpty(message = "任务名称不能为空！")
+    @Column(name = "`NAME`")
     private String name;
 
     /**
      * @Fields: 集群id
      */
-    @ApiModelProperty(value = "集群id", required = true, example = "", dataType = "String")
+    @NotEmpty(message = "集群ID不能为空！")
+    @Column(name = "`SERVICE_ID`")
     private String serviceId;
 
     /**
      * @Fields: 节点id
      */
-    @ApiModelProperty(value = "节点id", required = true, example = "", dataType = "String")
+    @NotEmpty(message = "节点ID不能为空！")
+    @Column(name = "`NODE_ID`")
     private String nodeId;
-
+    
     /**
      * @Fields: 节点名称
      */
-    @ApiModelProperty(value = "节点名称", required = true, example = "", dataType = "String")
+    @NotEmpty(message = "节点名称不能为空！")
+    @Column(name = "`NODE_NAME`")
     private String nodeName;
 
     /**
      * @Fields: 服务类型
      */
-    @ApiModelProperty(value = "服务类型", required = true, example = "", dataType = "String")
+    @NotEmpty(message = "服务类型不能为空！")
+    @Column(name = "`APP_TYPE`")
     private String appType;
 
     /**
      * @Fields: 任务类型----增量备份、全量备份、恢复
      */
-    @ApiModelProperty(value = "任务类型,全量备份 1、 增加备份 2、 恢复任务 3", required = true, example = "2", dataType = "String")
-    private Integer jobType; 
+    @NotNull(message = "任务类型不能为空")
+    @Column(name = "`JOB_TYPE`")
+    private Integer jobType;
 
     /**
      * @Fields: 相关联的任务id 只有在增量时使用
      */
-    @ApiModelProperty(value = "相关联的任务id 只有在增量时使用", required = false, example = "", dataType = "String")
+    @Column(name = "`RELATION_JOB_ID`")
     private String relationJobId;
 
     /**
      * @Fields: 调度类型 now 现在 once 一次性 day 每天 week 每周 month 每月 year 每年 repeat 重复任务
      */
-    @ApiModelProperty(value = "调度类型 now 现在 once 一次性 day 每天 week 每周 month 每月 year 每年 repeat 重复任务", required = false, example = "", dataType = "int")
-    private Integer scheduleType; 
+    @Column(name = "`SCHEDULE_TYPE`")
+    private Integer scheduleType;
 
     /**
      * @Fields: 年 4位数字 2018
      */
-    @ApiModelProperty(value = "年 4位数字", required = false, example = "2019", dataType = "String")
+    @Column(name = "`YEAR`")
     private String year;
 
     /**
      * @Fields: 月 1-12
      */
-    @ApiModelProperty(value = "月 1-12", required = false, example = "1", dataType = "String")
-    private String month;
+    @Column(name = "`MONTH`")
+    private String month; 
 
     /**
-     * @Fields: 周几1-7
+     * @Fields: 周几 1-7
      */
-    @ApiModelProperty(value = "周几 1-7", required = false, example = "1", dataType = "String")
-    private String week; 
+    @Column(name = "`WEEK`")
+    private String week;
 
     /**
      * @Fields: 天 1-31
      */
-    @ApiModelProperty(value = "天 1-31", required = false, example = "1", dataType = "String")
+    @Column(name = "`DAY`")
     private String day;
 
     /**
      * @Fields: 小时 00-24
      */
-    @ApiModelProperty(value = "小时 00-24", required = false, example = "00", dataType = "String")
-    private String hour;
+    @Column(name = "`HOUR`")
+    private String hour; 
 
     /**
      * @Fields: 分钟 00-60
      */
-    @ApiModelProperty(value = "分钟 00-60", required = false, example = "00", dataType = "String")
+    @Column(name = "`MINUTE`")
     private String minute;
 
     /**
      * @Fields: 秒 00-60
      */
-    @ApiModelProperty(value = "秒 00-60", required = false, example = "00", dataType = "String")
+    @Column(name = "`SECOND`")
     private String second;
 
     /**
      * @Fields: 定时表达式
      */
-    @ApiModelProperty(value = "定时表达式", required = false, example = "", dataType = "String")
+    @Column(name = "`CRON`")
     private String cron;
 
     /**
      * @Fields: 计划开始时间
      */
-    @ApiModelProperty(value = "计划开始时间", required = false, example = "", dataType = "String")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "`START_TIME`")
     private Date starttime;
 
     /**
      * @Fields: 计划结束时间
      */
-    @ApiModelProperty(value = "计划结束时间", required = false, example = "", dataType = "String")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "`END_TIME`")
     private Date endtime;
 
     /**
      * @Fields: 任务状态 1 默认 启用 -1 不启用
      */
-    @ApiModelProperty(value = "任务状态 1 默认 启用 -1 不启用", required = false, example = "1", dataType = "int")
+    @Column(name = "`STATUS`")
     private Integer status;
 
-    public String getTenantName() {
-        return tenantName;
+    /**
+     * @Fields: 任务创建时间
+     */
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "`CREATE_TIME`")
+    private Date createtime;
+
+    /**
+     * @Fields: 任务更新时间
+     */
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "`UPDATE_TIME`")
+    private Date updatetime;
+
+    public String getId() {
+        return id;
     }
 
-    public void setTenantName(String tenantName) {
-        this.tenantName = tenantName;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -295,13 +332,30 @@ public class SwJobModel {
         this.status = status;
     }
 
+    public Date getCreatetime() {
+        return createtime;
+    }
+
+    public void setCreatetime(Date createtime) {
+        this.createtime = createtime;
+    }
+
+    public Date getUpdatetime() {
+        return updatetime;
+    }
+
+    public void setUpdatetime(Date updatetime) {
+        this.updatetime = updatetime;
+    }
+
     @Override
     public String toString() {
-        return "Job [name=" + name + ", serviceId=" + serviceId + ", nodeId=" + nodeId + ", nodeName=" + nodeName
-                + ", appType=" + appType + ", jobType=" + jobType + ", relationJobId=" + relationJobId
+        return "Job [id=" + id + ", name=" + name + ", serviceId=" + serviceId + ", nodeId=" + nodeId + ", nodeName="
+                + nodeName + ", appType=" + appType + ", jobType=" + jobType + ", relationJobId=" + relationJobId
                 + ", scheduleType=" + scheduleType + ", year=" + year + ", month=" + month + ", week=" + week + ", day="
                 + day + ", hour=" + hour + ", minute=" + minute + ", second=" + second + ", cron=" + cron
-                + ", starttime=" + starttime + ", endtime=" + endtime + ", status=" + status + "]";
+                + ", starttime=" + starttime + ", endtime=" + endtime + ", status=" + status + ", createtime="
+                + createtime + ", updatetime=" + updatetime + "]";
     }
 
 }

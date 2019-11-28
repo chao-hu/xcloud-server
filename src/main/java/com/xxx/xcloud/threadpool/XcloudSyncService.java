@@ -34,9 +34,9 @@ import io.fabric8.kubernetes.api.model.apps.DeploymentCondition;
  * @since
  */
 @Component
-public class BdosSyncService {
+public class XcloudSyncService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BdosSyncService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(XcloudSyncService.class);
 
     @Autowired
     private ServiceRepository serviceRepository;
@@ -62,7 +62,7 @@ public class BdosSyncService {
                         .inNamespace(service.getTenantName()).withName(service.getServiceName()).get();
                 Integer replicas = deployment.getStatus().getReplicas();
                 Integer updatedReplicas = deployment.getStatus().getUpdatedReplicas();
-                if (replicas == updatedReplicas) {
+                if (replicas.equals(updatedReplicas)) {
                     service.setStatus(Global.OPERATION_RUNNING);
                     service.setUpdateTime(new Date());
                     service.setImageVersionId(imageVersionId);
