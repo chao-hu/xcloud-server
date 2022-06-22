@@ -104,7 +104,7 @@
         <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>kubernetes-client</artifactId>
-            <version>4.6.1</version><!-- 对应k8s的1.9版本 -->
+            <version>4.7.2</version><!-- 对应k8s的1.9版本 -->
         </dependency>
         
                 <!-- etcd V3 client -->
